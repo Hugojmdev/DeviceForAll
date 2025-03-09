@@ -1,0 +1,14 @@
+services:
+  db:
+    image: mysql:latest
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: device_loans
+      MYSQL_USER: hgojm_dev
+      MYSQL_PASSWORD: dev.pass_1234
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
