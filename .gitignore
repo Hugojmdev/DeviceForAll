@@ -37,6 +37,9 @@ application-*.yml
 *.iws
 out/
 *.ipr
+.idea/misc.xml
+.idea/modules.xml
+
 
 ### Eclipse ###
 .project
