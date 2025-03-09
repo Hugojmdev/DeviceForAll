@@ -1,0 +1,59 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+release.properties
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+
+### Spring Boot ###
+*.log
+logs/
+*.tmp
+spring.log
+.env
+application.properties
+application.yml
+application-*.yml
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+out/
+*.ipr
+
+### Eclipse ###
+.project
+.classpath
+.settings/
+.metadata/
+
+### VS Code ###
+.vscode/
+
+### MySQL ###
+*.sql
+*.sql.gz
+mysql-data/
+
+### Docker ###
+*.dockerfile
+docker-compose.override.yml
+.dockerignore
+/db_data/
