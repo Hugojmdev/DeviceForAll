@@ -1,6 +1,8 @@
 package com.hgo_soft.device_for_all.controller;
 
+import com.hgo_soft.device_for_all.dto.EmployeeDto;
 import com.hgo_soft.device_for_all.entity.Employee;
+import com.hgo_soft.device_for_all.mapper.EmployeeMapper;
 import com.hgo_soft.device_for_all.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,24 +19,24 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<Employee> getAll() {
-        return service.findAll();
+    public List<EmployeeDto> getAll() {
+        return EmployeeMapper.toDtoList(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public Employee getById(@PathVariable Long id) {
-        return service.findById(id);
+    public EmployeeDto getById(@PathVariable Long id) {
+        return EmployeeMapper.toDto(service.findById(id));
     }
 
     @PostMapping
-    public Employee create(@RequestBody Employee entity) {
-        return service.save(entity);
+    public EmployeeDto create(@RequestBody Employee entity) {
+        return EmployeeMapper.toDto(service.save(entity));
     }
 
     @PutMapping("/{id}")
-    public Employee update(@PathVariable Long id, @RequestBody Employee entity) {
+    public EmployeeDto update(@PathVariable Long id, @RequestBody Employee entity) {
         entity.setId(id);
-        return service.save(entity);
+        return EmployeeMapper.toDto(service.save(entity));
     }
 
     @DeleteMapping("/{id}")

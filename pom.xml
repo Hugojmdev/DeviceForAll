@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hgo-soft</groupId>
-	<artifactId>DeviceForAll</artifactId>
+	<artifactId>device-for-all</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>DeviceForAll</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Device-for-all</name>
+	<description>Device loans application</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -97,6 +97,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<mainClass>com.hgo_soft.device_for_all.DeviceForAllApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,6 +1,8 @@
 package com.hgo_soft.device_for_all.controller;
 
+import com.hgo_soft.device_for_all.dto.UserDto;
 import com.hgo_soft.device_for_all.entity.User;
+import com.hgo_soft.device_for_all.mapper.UserMapper;
 import com.hgo_soft.device_for_all.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,24 +19,24 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return service.findAll();
+    public List<UserDto> getAll() {
+        return UserMapper.toDtoList(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return service.findById(id);
+    public UserDto getById(@PathVariable Long id) {
+        return UserMapper.toDto(service.findById(id));
     }
 
     @PostMapping
-    public User create(@RequestBody User entity) {
-        return service.save(entity);
+    public UserDto create(@RequestBody User entity) {
+        return UserMapper.toDto(service.save(entity));
     }
 
     @PutMapping("/{id}")
-    public User update(@PathVariable Long id, @RequestBody User entity) {
+    public UserDto update(@PathVariable Long id, @RequestBody User entity) {
         entity.setId(id);
-        return service.save(entity);
+        return UserMapper.toDto(service.save(entity));
     }
 
     @DeleteMapping("/{id}")

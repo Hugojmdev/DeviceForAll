@@ -1,13 +1,15 @@
 package com.hgo_soft.device_for_all.controller;
 
+import com.hgo_soft.device_for_all.dto.DeviceStatusDto;
 import com.hgo_soft.device_for_all.entity.DeviceStatus;
+import com.hgo_soft.device_for_all.mapper.DeviceStatusMapper;
 import com.hgo_soft.device_for_all.service.DeviceStatusService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/deviceStatuss")
+@RequestMapping("/api/deviceStatus")
 public class DeviceStatusController {
 
     private final DeviceStatusService service;
@@ -17,24 +19,24 @@ public class DeviceStatusController {
     }
 
     @GetMapping
-    public List<DeviceStatus> getAll() {
-        return service.findAll();
+    public List<DeviceStatusDto> getAll() {
+        return DeviceStatusMapper.toDtoList(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public DeviceStatus getById(@PathVariable Long id) {
-        return service.findById(id);
+    public DeviceStatusDto getById(@PathVariable Long id) {
+        return DeviceStatusMapper.toDto(service.findById(id));
     }
 
     @PostMapping
-    public DeviceStatus create(@RequestBody DeviceStatus entity) {
-        return service.save(entity);
+    public DeviceStatusDto create(@RequestBody DeviceStatus entity) {
+        return DeviceStatusMapper.toDto(service.save(entity));
     }
 
     @PutMapping("/{id}")
-    public DeviceStatus update(@PathVariable Long id, @RequestBody DeviceStatus entity) {
+    public DeviceStatusDto update(@PathVariable Long id, @RequestBody DeviceStatus entity) {
         entity.setId(id);
-        return service.save(entity);
+        return DeviceStatusMapper.toDto(service.save(entity));
     }
 
     @DeleteMapping("/{id}")
