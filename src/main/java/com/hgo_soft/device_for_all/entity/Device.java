@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class Device {
     private String libraryDeviceUniqueId;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "status_id")
     private DeviceStatus status;
 

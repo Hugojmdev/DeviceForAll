@@ -1,16 +1,16 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.EmployeeDto;
-import com.hgo_soft.device_for_all.entity.Employee;
 import com.hgo_soft.device_for_all.mapper.EmployeeMapper;
 import com.hgo_soft.device_for_all.service.EmployeeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
-public class EmployeeController {
+public class EmployeeController extends AbstractRestController{
 
     private final EmployeeService service;
 
@@ -19,28 +19,31 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<EmployeeDto> getAll() {
-        return EmployeeMapper.toDtoList(service.findAll());
+    public ResponseEntity<List<EmployeeDto>> getAll() {
+        return okOrEmpty(EmployeeMapper.toDtoList(service.findAll()));
     }
 
     @GetMapping("/{id}")
-    public EmployeeDto getById(@PathVariable Long id) {
-        return EmployeeMapper.toDto(service.findById(id));
+    public ResponseEntity<EmployeeDto> getById(@PathVariable Long id) {
+        return okOrNotFound(EmployeeMapper.toDto(service.findById(id)));
     }
 
     @PostMapping
-    public EmployeeDto create(@RequestBody Employee entity) {
-        return EmployeeMapper.toDto(service.save(entity));
+    public ResponseEntity<EmployeeDto> create(@RequestBody EmployeeDto employeeDto) {
+        EmployeeDto saved = EmployeeMapper.toDto(service.save(EmployeeMapper.toEntity(employeeDto)));
+        return created("/api/employees/" + saved.getId(), saved);
     }
 
     @PutMapping("/{id}")
-    public EmployeeDto update(@PathVariable Long id, @RequestBody Employee entity) {
-        entity.setId(id);
-        return EmployeeMapper.toDto(service.save(entity));
+    public ResponseEntity<EmployeeDto> update(@PathVariable Long id, @RequestBody EmployeeDto employeeDto) {
+        employeeDto.setId(id);
+        EmployeeDto updated = EmployeeMapper.toDto(service.save(EmployeeMapper.toEntity(employeeDto)));
+        return okOrNotFound(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
+        return deletedSuccessfully();
     }
 }

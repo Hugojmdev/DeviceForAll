@@ -1,16 +1,16 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.TeacherDto;
-import com.hgo_soft.device_for_all.entity.Teacher;
 import com.hgo_soft.device_for_all.mapper.TeacherMapper;
 import com.hgo_soft.device_for_all.service.TeacherService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/teachers")
-public class TeacherController {
+public class TeacherController extends AbstractRestController{
 
     private final TeacherService service;
 
@@ -19,28 +19,31 @@ public class TeacherController {
     }
 
     @GetMapping
-    public List<TeacherDto> getAll() {
-        return TeacherMapper.toDtoList(service.findAll());
+    public ResponseEntity<List<TeacherDto>> getAll() {
+        return okOrEmpty(TeacherMapper.toDtoList(service.findAll()));
     }
 
     @GetMapping("/{id}")
-    public TeacherDto getById(@PathVariable Long id) {
-        return TeacherMapper.toDto(service.findById(id));
+    public ResponseEntity<TeacherDto> getById(@PathVariable Long id) {
+        return okOrNotFound(TeacherMapper.toDto(service.findById(id)));
     }
 
     @PostMapping
-    public TeacherDto create(@RequestBody Teacher entity) {
-        return TeacherMapper.toDto(service.save(entity));
+    public ResponseEntity<TeacherDto> create(@RequestBody TeacherDto teacherDto) {
+        TeacherDto saved = TeacherMapper.toDto(service.save(TeacherMapper.toEntity(teacherDto)));
+        return created("/api/teachers/" + saved.getId(), saved);
     }
 
     @PutMapping("/{id}")
-    public TeacherDto update(@PathVariable Long id, @RequestBody Teacher entity) {
-        entity.setId(id);
-        return TeacherMapper.toDto(service.save(entity));
+    public ResponseEntity<TeacherDto> update(@PathVariable Long id, @RequestBody TeacherDto teacherDto) {
+        teacherDto.setId(id);
+        TeacherDto updated = TeacherMapper.toDto(service.save(TeacherMapper.toEntity(teacherDto)));
+        return okOrNotFound(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
+        return deletedSuccessfully();
     }
 }
