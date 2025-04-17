@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.RoleDto;
+import com.hgo_soft.device_for_all.entity.Role;
 import com.hgo_soft.device_for_all.mapper.RoleMapper;
 import com.hgo_soft.device_for_all.service.RoleService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,9 @@ public class RoleController extends AbstractRestController{
 
     @GetMapping("/{id}")
     public ResponseEntity<RoleDto> getById(@PathVariable Long id) {
-        return okOrNotFound(RoleMapper.toDto(service.findById(id)));
+        return okOrNotFound(
+                service.findById(id).map(RoleMapper::toDto)
+        );
     }
 
     @PostMapping

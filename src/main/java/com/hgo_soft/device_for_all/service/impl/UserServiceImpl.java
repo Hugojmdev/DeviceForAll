@@ -1,11 +1,13 @@
 package com.hgo_soft.device_for_all.service.impl;
 
 import com.hgo_soft.device_for_all.entity.User;
+import com.hgo_soft.device_for_all.exception.ResourceNotFoundException;
 import com.hgo_soft.device_for_all.repository.UserRepository;
 import com.hgo_soft.device_for_all.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,8 +24,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) {
-        return repository.findById(id).orElse(null);
+    public Optional<User> findById(Long id) {
+        return repository.findById(id)/*.orElse(new User());*//*.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id))*/;
     }
 
     @Override

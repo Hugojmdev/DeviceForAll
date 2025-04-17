@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.UserDto;
+import com.hgo_soft.device_for_all.entity.User;
 import com.hgo_soft.device_for_all.mapper.UserMapper;
 import com.hgo_soft.device_for_all.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,11 @@ public class UserController extends AbstractRestController{
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
-        return okOrNotFound(UserMapper.toDto(service.findById(id)));
+        /*User user = service.findById(id);
+        return okOrNotFound(UserMapper.toDto(user));*/
+        return okOrNotFound(
+                service.findById(id).map(UserMapper::toDto)
+        );
     }
 
     @PostMapping

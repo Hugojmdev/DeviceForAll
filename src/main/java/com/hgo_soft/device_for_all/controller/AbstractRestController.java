@@ -11,6 +11,11 @@ public abstract class AbstractRestController {
         return body == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(body);
     }
 
+    protected <T> ResponseEntity<T> okOrNotFound(Optional<T> optional) {
+        return optional.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     protected <T> ResponseEntity<List<T>> okOrEmpty(List<T> list) {
         return ResponseEntity.ok(Optional.ofNullable(list).orElse(Collections.emptyList()));
     }

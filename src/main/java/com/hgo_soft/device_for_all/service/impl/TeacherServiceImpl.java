@@ -1,11 +1,13 @@
 package com.hgo_soft.device_for_all.service.impl;
 
 import com.hgo_soft.device_for_all.entity.Teacher;
+import com.hgo_soft.device_for_all.exception.ResourceNotFoundException;
 import com.hgo_soft.device_for_all.repository.TeacherRepository;
 import com.hgo_soft.device_for_all.service.TeacherService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -22,8 +24,8 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public Teacher findById(Long id) {
-        return repository.findById(id).orElse(null);
+    public Optional<Teacher> findById(Long id) {
+        return repository.findById(id)/*.orElse(new Teacher());*//*.orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id: " + id))*/;
     }
 
     @Override

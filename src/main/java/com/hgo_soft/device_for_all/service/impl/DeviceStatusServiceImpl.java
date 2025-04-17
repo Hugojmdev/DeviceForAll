@@ -1,11 +1,13 @@
 package com.hgo_soft.device_for_all.service.impl;
 
 import com.hgo_soft.device_for_all.entity.DeviceStatus;
+import com.hgo_soft.device_for_all.exception.ResourceNotFoundException;
 import com.hgo_soft.device_for_all.repository.DeviceStatusRepository;
 import com.hgo_soft.device_for_all.service.DeviceStatusService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceStatusServiceImpl implements DeviceStatusService {
@@ -22,8 +24,8 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     @Override
-    public DeviceStatus findById(Long id) {
-        return repository.findById(id).orElse(null);
+    public Optional<DeviceStatus> findById(Long id) {
+        return repository.findById(id)/*.orElse(new DeviceStatus());*//*.orElseThrow(() -> new ResourceNotFoundException("DeviceStatus not found with id: " + id))*/;
     }
 
     @Override

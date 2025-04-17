@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.TeacherDto;
+import com.hgo_soft.device_for_all.entity.Teacher;
 import com.hgo_soft.device_for_all.mapper.TeacherMapper;
 import com.hgo_soft.device_for_all.service.TeacherService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,11 @@ public class TeacherController extends AbstractRestController{
 
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> getById(@PathVariable Long id) {
-        return okOrNotFound(TeacherMapper.toDto(service.findById(id)));
+        /*Teacher teacher = service.findById(id);
+        return okOrNotFound(TeacherMapper.toDto(teacher));*/
+        return okOrNotFound(
+                service.findById(id).map(TeacherMapper::toDto)
+        );
     }
 
     @PostMapping

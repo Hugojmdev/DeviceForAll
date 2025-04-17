@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.DeviceDto;
+import com.hgo_soft.device_for_all.entity.Device;
 import com.hgo_soft.device_for_all.mapper.DeviceMapper;
 import com.hgo_soft.device_for_all.service.DeviceService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,11 @@ public class DeviceController extends AbstractRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DeviceDto> getById(@PathVariable Long id) {
-        return okOrNotFound(DeviceMapper.toDto(service.findById(id)));
+        /*Device device = service.findById(id);
+        return okOrNotFound(DeviceMapper.toDto(device));*/
+        return okOrNotFound(
+                service.findById(id).map(DeviceMapper::toDto)
+        );
     }
 
     @PostMapping

@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.EmployeeDto;
+import com.hgo_soft.device_for_all.entity.Employee;
 import com.hgo_soft.device_for_all.mapper.EmployeeMapper;
 import com.hgo_soft.device_for_all.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,9 @@ public class EmployeeController extends AbstractRestController{
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDto> getById(@PathVariable Long id) {
-        return okOrNotFound(EmployeeMapper.toDto(service.findById(id)));
+        return okOrNotFound(
+                service.findById(id).map(EmployeeMapper::toDto)
+        );
     }
 
     @PostMapping
