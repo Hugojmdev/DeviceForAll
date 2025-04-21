@@ -29,4 +29,6 @@ public class Device {
     @JoinColumn(name = "status_id")
     private DeviceStatus status;
 
+    public Device(long l) {
+    }
 }

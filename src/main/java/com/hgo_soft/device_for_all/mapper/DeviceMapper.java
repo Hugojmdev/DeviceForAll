@@ -3,11 +3,10 @@ package com.hgo_soft.device_for_all.mapper;
 import com.hgo_soft.device_for_all.dto.DeviceDto;
 import com.hgo_soft.device_for_all.entity.Device;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DeviceMapper {
-    public static DeviceDto toDto(Device device) {
+    public  DeviceDto toDto(Device device) {
         if (device == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -16,14 +15,14 @@ public class DeviceMapper {
         return dto;
     }
 
-    public static List<DeviceDto> toDtoList(List<Device> devices){
+    public  List<DeviceDto> toDtoList(List<Device> devices){
         if(devices == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return devices.stream().map(DeviceMapper::toDto).toList();
+        return devices.stream().map(this::toDto).toList();
     }
 
-    public static Device toEntity(DeviceDto deviceDto) {
+    public  Device toEntity(DeviceDto deviceDto) {
         if (deviceDto == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -32,10 +31,10 @@ public class DeviceMapper {
         return device;
     }
 
-    public static List<Device> toEntityList(List<DeviceDto> deviceDtos){
+    public  List<Device> toEntityList(List<DeviceDto> deviceDtos){
         if(deviceDtos == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return deviceDtos.stream().map(DeviceMapper::toEntity).toList();
+        return deviceDtos.stream().map(this::toEntity).toList();
     }
 }
