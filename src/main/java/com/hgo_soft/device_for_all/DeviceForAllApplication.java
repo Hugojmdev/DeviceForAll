@@ -1,4 +1,4 @@
-package com.hgo_soft.DeviceForAll;
+package com.hgo_soft.device_for_all;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
