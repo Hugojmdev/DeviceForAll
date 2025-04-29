@@ -1,8 +1,8 @@
 package com.hgo_soft.device_for_all.controller;
 import com.hgo_soft.device_for_all.dto.DeviceDto;
 import com.hgo_soft.device_for_all.entity.Device;
-import com.hgo_soft.device_for_all.service.DeviceService;
 import com.hgo_soft.device_for_all.mapper.DeviceMapper;
+import com.hgo_soft.device_for_all.service.DeviceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -29,12 +29,12 @@ class DeviceControllerTest {
     @Test
     void testGetAll_ShouldReturnListOfDevices() {
         List<Device> devices = Arrays.asList(
-                new Device(1L),
-                new Device(2L)
+                Device.builder().id(1L).build(),
+                Device.builder().id(2L).build()
         );
         List<DeviceDto> deviceDtos = Arrays.asList(
-                new DeviceDto(1L),
-                new DeviceDto(2L)
+                DeviceDto.builder().id(1L).build(),
+                DeviceDto.builder().id(2L).build()
         );
         when(mapper.toEntityList(anyList())).thenReturn(devices);
         when(mapper.toDtoList(anyList())).thenReturn(deviceDtos);
@@ -65,9 +65,9 @@ class DeviceControllerTest {
     @Test
     void testGetById_Found() {
         long id = 1L;
-        DeviceDto inputDto = new DeviceDto(id);
-        Device entityToFound = new Device(id);
-        DeviceDto dtoToFound = new DeviceDto(id);
+        DeviceDto inputDto = DeviceDto.builder().id(id).build();
+        Device entityToFound = Device.builder().id(id).build();
+        DeviceDto dtoToFound = DeviceDto.builder().id(id).build();
         when(mapper.toEntity(inputDto)).thenReturn(entityToFound);
         when(mapper.toDto(entityToFound)).thenReturn(dtoToFound);
         when(service.findById(any())).thenReturn(Optional.of(entityToFound));
@@ -92,8 +92,8 @@ class DeviceControllerTest {
     void testCreate_ShouldReturnCreatedDevice() {
         long id = 10L;
         DeviceDto inputDto = new DeviceDto();
-        Device savedEntity = new Device(id);
-        DeviceDto savedDto = new DeviceDto(id);
+        Device savedEntity = Device.builder().id(id).build();
+        DeviceDto savedDto = DeviceDto.builder().id(id).build();
         // simulate mapper and persistence
         when(mapper.toEntity(inputDto)).thenReturn(savedEntity);
         when(mapper.toDto(savedEntity)).thenReturn(savedDto);
@@ -106,10 +106,9 @@ class DeviceControllerTest {
     @Test
     void testUpdate_ShouldReturnUpdatedDevice() {
         Long id = 5L;
-        DeviceDto inputDto = new DeviceDto(id);
-        Device savedEntity = new Device();
-        savedEntity.setId(id);
-        DeviceDto savedDto = new DeviceDto(id);
+        DeviceDto inputDto = DeviceDto.builder().id(id).build();
+        Device savedEntity = Device.builder().id(id).build();
+        DeviceDto savedDto = DeviceDto.builder().id(id).build();
         when(mapper.toEntity(inputDto)).thenReturn(savedEntity);
         when(mapper.toDto(savedEntity)).thenReturn(savedDto);
         when(service.save(any())).thenReturn(savedEntity);

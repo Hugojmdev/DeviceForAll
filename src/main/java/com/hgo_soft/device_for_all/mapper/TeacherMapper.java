@@ -3,11 +3,10 @@ package com.hgo_soft.device_for_all.mapper;
 import com.hgo_soft.device_for_all.dto.TeacherDto;
 import com.hgo_soft.device_for_all.entity.Teacher;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TeacherMapper {
-    public static TeacherDto toDto(Teacher teacher) {
+    public TeacherDto toDto(Teacher teacher) {
         if (teacher == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -16,14 +15,14 @@ public class TeacherMapper {
         return dto;
     }
 
-    public static List<TeacherDto> toDtoList(List<Teacher> Teachers){
+    public List<TeacherDto> toDtoList(List<Teacher> Teachers){
         if(Teachers == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return Teachers.stream().map(TeacherMapper::toDto).toList();
+        return Teachers.stream().map(this::toDto).toList();
     }
 
-    public static Teacher toEntity(TeacherDto teacherDto) {
+    public Teacher toEntity(TeacherDto teacherDto) {
         if (teacherDto == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -32,10 +31,10 @@ public class TeacherMapper {
         return teacher;
     }
 
-    public static List<Teacher> toEntityList(List<TeacherDto> TeacherDtos){
+    public List<Teacher> toEntityList(List<TeacherDto> TeacherDtos){
         if(TeacherDtos == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return TeacherDtos.stream().map(TeacherMapper::toEntity).toList();
+        return TeacherDtos.stream().map(this::toEntity).toList();
     }
 }

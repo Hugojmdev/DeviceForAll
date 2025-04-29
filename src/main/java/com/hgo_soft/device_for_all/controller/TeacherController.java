@@ -1,7 +1,6 @@
 package com.hgo_soft.device_for_all.controller;
 
 import com.hgo_soft.device_for_all.dto.TeacherDto;
-import com.hgo_soft.device_for_all.entity.Teacher;
 import com.hgo_soft.device_for_all.mapper.TeacherMapper;
 import com.hgo_soft.device_for_all.service.TeacherService;
 import org.springframework.http.ResponseEntity;
@@ -14,35 +13,35 @@ import java.util.List;
 public class TeacherController extends AbstractRestController{
 
     private final TeacherService service;
+    private final TeacherMapper mapper;
 
-    public TeacherController(TeacherService service) {
+    public TeacherController(TeacherService service, TeacherMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping
     public ResponseEntity<List<TeacherDto>> getAll() {
-        return okOrEmpty(TeacherMapper.toDtoList(service.findAll()));
+        return okOrEmpty(mapper.toDtoList(service.findAll()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TeacherDto> getById(@PathVariable Long id) {
-        /*Teacher teacher = service.findById(id);
-        return okOrNotFound(TeacherMapper.toDto(teacher));*/
         return okOrNotFound(
-                service.findById(id).map(TeacherMapper::toDto)
+                service.findById(id).map(mapper::toDto)
         );
     }
 
     @PostMapping
     public ResponseEntity<TeacherDto> create(@RequestBody TeacherDto teacherDto) {
-        TeacherDto saved = TeacherMapper.toDto(service.save(TeacherMapper.toEntity(teacherDto)));
+        TeacherDto saved = mapper.toDto(service.save(mapper.toEntity(teacherDto)));
         return created("/api/teachers/" + saved.getId(), saved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TeacherDto> update(@PathVariable Long id, @RequestBody TeacherDto teacherDto) {
         teacherDto.setId(id);
-        TeacherDto updated = TeacherMapper.toDto(service.save(TeacherMapper.toEntity(teacherDto)));
+        TeacherDto updated = mapper.toDto(service.save(mapper.toEntity(teacherDto)));
         return okOrNotFound(updated);
     }
 

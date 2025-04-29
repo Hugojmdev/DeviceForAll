@@ -3,11 +3,10 @@ package com.hgo_soft.device_for_all.mapper;
 import com.hgo_soft.device_for_all.dto.RoleDto;
 import com.hgo_soft.device_for_all.entity.Role;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RoleMapper {
-    public static RoleDto toDto(Role role) {
+    public RoleDto toDto(Role role) {
         if (role == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -17,14 +16,14 @@ public class RoleMapper {
         return dto;
     }
 
-    public static List<RoleDto> toDtoList(List<Role> roles){
+    public List<RoleDto> toDtoList(List<Role> roles){
         if(roles == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return roles.stream().map(RoleMapper::toDto).toList();
+        return roles.stream().map(this::toDto).toList();
     }
 
-    public static Role toEntity(RoleDto roleDto) {
+    public Role toEntity(RoleDto roleDto) {
         if (roleDto == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -34,10 +33,10 @@ public class RoleMapper {
         return role;
     }
 
-    public static List<Role> toEntityList(List<RoleDto> roleDtos){
+    public List<Role> toEntityList(List<RoleDto> roleDtos){
         if(roleDtos == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return roleDtos.stream().map(RoleMapper::toEntity).toList();
+        return roleDtos.stream().map(this::toEntity).toList();
     }
 }
