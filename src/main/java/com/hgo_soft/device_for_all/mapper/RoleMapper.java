@@ -2,9 +2,11 @@ package com.hgo_soft.device_for_all.mapper;
 
 import com.hgo_soft.device_for_all.dto.RoleDto;
 import com.hgo_soft.device_for_all.entity.Role;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class RoleMapper {
     public RoleDto toDto(Role role) {
         if (role == null) {

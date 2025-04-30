@@ -2,9 +2,11 @@ package com.hgo_soft.device_for_all.mapper;
 
 import com.hgo_soft.device_for_all.dto.DeviceDto;
 import com.hgo_soft.device_for_all.entity.Device;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class DeviceMapper {
     public  DeviceDto toDto(Device device) {
         if (device == null) {

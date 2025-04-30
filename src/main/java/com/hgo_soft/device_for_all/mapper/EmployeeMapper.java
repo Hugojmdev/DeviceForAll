@@ -2,9 +2,11 @@ package com.hgo_soft.device_for_all.mapper;
 
 import com.hgo_soft.device_for_all.dto.EmployeeDto;
 import com.hgo_soft.device_for_all.entity.Employee;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class EmployeeMapper {
     public EmployeeDto toDto(Employee employee) {
         if (employee == null) {

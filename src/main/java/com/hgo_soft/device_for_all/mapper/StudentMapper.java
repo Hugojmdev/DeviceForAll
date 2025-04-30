@@ -2,9 +2,11 @@ package com.hgo_soft.device_for_all.mapper;
 
 import com.hgo_soft.device_for_all.dto.StudentDto;
 import com.hgo_soft.device_for_all.entity.Student;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class StudentMapper {
     public StudentDto toDto(Student student) {
         if (student == null) {
