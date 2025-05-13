@@ -28,5 +28,4 @@ public class Device {
     @JsonBackReference
     @JoinColumn(name = "status_id")
     private DeviceStatus status;
-
 }

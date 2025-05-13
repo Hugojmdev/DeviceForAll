@@ -2,12 +2,13 @@ package com.hgo_soft.device_for_all.mapper;
 
 import com.hgo_soft.device_for_all.dto.EmployeeDto;
 import com.hgo_soft.device_for_all.entity.Employee;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class EmployeeMapper {
-    public static EmployeeDto toDto(Employee employee) {
+    public EmployeeDto toDto(Employee employee) {
         if (employee == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -16,14 +17,14 @@ public class EmployeeMapper {
         return dto;
     }
 
-    public static List<EmployeeDto> toDtoList(List<Employee> employees){
+    public List<EmployeeDto> toDtoList(List<Employee> employees){
         if(employees == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return employees.stream().map(EmployeeMapper::toDto).toList();
+        return employees.stream().map(this::toDto).toList();
     }
 
-    public static Employee toEntity(EmployeeDto employeeDto) {
+    public Employee toEntity(EmployeeDto employeeDto) {
         if (employeeDto == null) {
             throw new IllegalStateException("Null value cannot be mapped");
         }
@@ -32,10 +33,10 @@ public class EmployeeMapper {
         return employee;
     }
 
-    public static List<Employee> toEntityList(List<EmployeeDto> employeeDtos){
+    public List<Employee> toEntityList(List<EmployeeDto> employeeDtos){
         if(employeeDtos == null)  {
             throw new IllegalStateException("Null value cannot be mapped");
         }
-        return employeeDtos.stream().map(EmployeeMapper::toEntity).toList();
+        return employeeDtos.stream().map(this::toEntity).toList();
     }
 }
