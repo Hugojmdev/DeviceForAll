@@ -1,6 +1,8 @@
 package com.hgo_soft.device_for_all.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.hgo_soft.device_for_all.enums.DeviceStatus;
+import com.hgo_soft.device_for_all.enums.DeviceType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,16 +18,21 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String serialNumber;
+    private String name;
 
-    private String type;
+    private String serialNumber;
 
     private String model;
 
-    private String libraryDeviceUniqueId;
+    private String description;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "status_id")
-    private DeviceStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private DeviceType deviceType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private DeviceStatus deviceStatus;
+
+
 }

@@ -16,19 +16,18 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JsonBackReference
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "user_detail_id")
+    private UserDetail userDetail;
 
-    private String name;
-
-    private String email;
-
-    private String address;
+    @OneToOne
+    @JsonBackReference
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     private String career;
 
-    private String department;
+    private String grade;
 
 }
