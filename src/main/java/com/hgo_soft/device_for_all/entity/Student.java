@@ -21,7 +21,7 @@ public class Student {
     @JoinColumn(name = "user_detail_id")
     private UserDetail userDetail;
 
-    @OneToOne
+    @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "department_id")
     private Department department;

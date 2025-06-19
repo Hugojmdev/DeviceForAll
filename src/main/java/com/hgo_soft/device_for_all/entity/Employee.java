@@ -19,16 +19,16 @@ public class Employee {
 
     @OneToOne
     @JsonBackReference
-    @JoinColumn(name = "user_detail_id")
+    @JoinColumn(name = "user_detail_id", nullable = false)
     private UserDetail user;
 
-    @OneToOne
+    @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "employee_type", nullable = false)
-    private EmployeeType employeeType;
+    private EmployeeType type;
 
 }

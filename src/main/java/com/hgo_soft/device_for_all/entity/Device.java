@@ -1,6 +1,5 @@
 package com.hgo_soft.device_for_all.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.hgo_soft.device_for_all.enums.DeviceStatus;
 import com.hgo_soft.device_for_all.enums.DeviceType;
 import jakarta.persistence.*;
@@ -28,11 +27,11 @@ public class Device {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private DeviceType deviceType;
+    private DeviceType type;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private DeviceStatus deviceStatus;
+    @Column(name = "status", nullable = false)
+    private DeviceStatus status;
 
 
 }
