@@ -16,17 +16,11 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JsonBackReference
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
 
-    private String name;
-
-    private String email;
-
-    private String address;
-
-    private String department;
+    private String academicTitle;
 
 }

@@ -1,7 +1,6 @@
 package com.hgo_soft.device_for_all.repository;
 
 import com.hgo_soft.device_for_all.entity.Department;
-import com.hgo_soft.device_for_all.entity.Student;
 import com.hgo_soft.device_for_all.entity.UserDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,32 +14,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class StudentRepositoryTest extends RepositoryTestSetup {
-
+public class DepartmentRepositoryTest extends RepositoryTestSetup{
     @Autowired
-    private StudentRepository repository;
+    private DepartmentRepository repository;
 
     @Test
     void testSave() {
-        Student student = Student.builder()
-                .id(3L)
-                .userDetail(UserDetail.builder().id(3L).build())
-                .department(Department.builder().id(1L).build())
+        Department department = Department.builder()
+                .id(1L)
+                .name("Philosophy")
                 .build();
-        Student saved = repository.save(student);
+        Department saved = repository.save(department);
         assertNotNull(saved.getId());
     }
 
     @Test
     void testFindById() {
-        Optional<Student> result = repository.findById(1L);
+        Optional<Department> result = repository.findById(1L);
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
-        List<Student> list = repository.findAll();
-        assertTrue(list.size() >= 2);
+        List<Department> list = repository.findAll();
+        assertTrue(list.size() >= 1);
     }
 
     @Test

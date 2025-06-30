@@ -1,6 +1,8 @@
 package com.hgo_soft.device_for_all.repository;
 
 import com.hgo_soft.device_for_all.entity.Device;
+import com.hgo_soft.device_for_all.enums.DeviceStatus;
+import com.hgo_soft.device_for_all.enums.DeviceType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,14 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class DeviceRepositoryTest {
+public class DeviceRepositoryTest extends RepositoryTestSetup {
 
     @Autowired
     DeviceRepository repository;
 
     @Test
     public void testSave(){
-        Device newDevice = Device.builder().id(1L).build();
+        Device newDevice = Device.builder().id(1L)
+                .type(DeviceType.MEDIA_EQUIPMENT)
+                .status(DeviceStatus.AVAILABLE)
+                .build();
         Device savedDevice = repository.save(newDevice);
         assertNotNull(savedDevice.getId());
     }
@@ -31,7 +36,8 @@ public class DeviceRepositoryTest {
                 .id(1L)
                 .serialNumber("SN123")
                 .model("X2023")
-                .type("Tablet")
+                .type(DeviceType.MOBILE)
+                .status(DeviceStatus.AVAILABLE)
                 .build();
 
         Device saved = repository.save(device);
@@ -52,33 +58,14 @@ public class DeviceRepositoryTest {
 
     @Test
     void testFindAll() {
-        Device d1 = Device.builder().id(1L).serialNumber("SN1").model("M1").type("Laptop").build();
-        Device d2 = Device.builder().id(2L).serialNumber("SN2").model("M2").type("Phone").build();
-
-        repository.save(d1);
-        repository.save(d2);
-
         List<Device> allDevices = repository.findAll();
         assertEquals(2, allDevices.size());
     }
 
     @Test
     void testDeleteById() {
-        Device device = Device.builder()
-                .id(99L)
-                .serialNumber("SN99")
-                .model("M99")
-                .type("Router")
-                .build();
-
-        Device saved = repository.save(device);
-
-        Long id = saved.getId();
-        assertTrue(repository.findById(id).isPresent());
-
-        repository.deleteById(id);
-
-        assertFalse(repository.findById(id).isPresent());
+        repository.deleteById(1L);
+        assertFalse(repository.findById(1L).isPresent());
     }
 
     @Test
@@ -87,7 +74,8 @@ public class DeviceRepositoryTest {
                 .id(321L)
                 .serialNumber("SN321")
                 .model("M321")
-                .type("Camera")
+                .type(DeviceType.MEDIA_EQUIPMENT)
+                .status(DeviceStatus.AVAILABLE)
                 .build();
 
         Device saved = repository.save(device);

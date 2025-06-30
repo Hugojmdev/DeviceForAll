@@ -1,34 +1,33 @@
 package com.hgo_soft.device_for_all.service.impl;
 
-import com.hgo_soft.device_for_all.entity.Student;
-import com.hgo_soft.device_for_all.repository.StudentRepository;
-import com.hgo_soft.device_for_all.service.StudentService;
+import com.hgo_soft.device_for_all.entity.Loan;
+import com.hgo_soft.device_for_all.repository.LoanRepository;
+import com.hgo_soft.device_for_all.service.LoanService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class StudentServiceImpl implements StudentService {
+public class LoanServiceImpl implements LoanService {
+    private final LoanRepository repository;
 
-    private final StudentRepository repository;
-
-    public StudentServiceImpl(StudentRepository repository) {
+    public LoanServiceImpl(LoanRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public List<Student> findAll() {
+    public List<Loan> findAll() {
         return repository.findAll();
     }
 
     @Override
-    public Optional<Student> findById(Long id) {
+    public Optional<Loan> findById(Long id) {
         return repository.findById(id);
     }
 
     @Override
-    public Student save(Student entity) {
+    public Loan save(Loan entity) {
         return repository.save(entity);
     }
 

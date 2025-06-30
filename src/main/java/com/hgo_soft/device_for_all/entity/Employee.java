@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.hgo_soft.device_for_all.enums.EmployeeType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,17 +17,18 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne
+    @JsonBackReference
+    @JoinColumn(name = "user_detail_id", nullable = false)
+    private UserDetail user;
+
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
 
-    private String name;
-
-    private String email;
-
-    private String address;
-
-    private String department;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "employee_type", nullable = false)
+    private EmployeeType type;
 
 }

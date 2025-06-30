@@ -13,39 +13,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class UserRepositoryTest {
+public class UserRepositoryTest extends RepositoryTestSetup {
 
     @Autowired
     private UserRepository repository;
 
     @Test
     void testSave() {
-        User user = User.builder().email("test@example.com").build();
+        User user = User.builder().id(1L).build();
         User saved = repository.save(user);
         assertNotNull(saved.getId());
     }
 
     @Test
     void testFindById() {
-        User user = User.builder().email("test@example.com").build();
-        User saved = repository.save(user);
-        Optional<User> result = repository.findById(saved.getId());
+        Optional<User> result = repository.findById(1L);
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
-        repository.save(User.builder().email("one@example.com").build());
-        repository.save(User.builder().email("two@example.com").build());
         List<User> list = repository.findAll();
         assertTrue(list.size() >= 2);
     }
 
     @Test
     void testDeleteById() {
-        User user = User.builder().email("delete@example.com").build();
-        User saved = repository.save(user);
-        repository.deleteById(saved.getId());
-        assertFalse(repository.findById(saved.getId()).isPresent());
+        repository.deleteById(1L);
+        assertFalse(repository.findById(1L).isPresent());
     }
 }

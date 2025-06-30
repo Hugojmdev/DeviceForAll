@@ -1,7 +1,5 @@
 package com.hgo_soft.device_for_all.repository;
 
-import com.hgo_soft.device_for_all.entity.Department;
-import com.hgo_soft.device_for_all.entity.Student;
 import com.hgo_soft.device_for_all.entity.UserDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,40 +10,41 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class StudentRepositoryTest extends RepositoryTestSetup {
+public class UserDetailRepositoryTest extends RepositoryTestSetup{
 
     @Autowired
-    private StudentRepository repository;
+    private UserDetailRepository repository;
 
     @Test
     void testSave() {
-        Student student = Student.builder()
-                .id(3L)
-                .userDetail(UserDetail.builder().id(3L).build())
-                .department(Department.builder().id(1L).build())
+        UserDetail userDetail = UserDetail.builder()
+                .email("test@email.com")
+                .firstName("Fred")
+                .lastName("Sanfield")
                 .build();
-        Student saved = repository.save(student);
+        UserDetail saved = repository.save(userDetail);
         assertNotNull(saved.getId());
     }
 
     @Test
     void testFindById() {
-        Optional<Student> result = repository.findById(1L);
+        Optional<UserDetail> result = repository.findById(3L);
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
-        List<Student> list = repository.findAll();
-        assertTrue(list.size() >= 2);
+        List<UserDetail> list = repository.findAll();
+        assertFalse(list.isEmpty());
     }
 
     @Test
     void testDeleteById() {
-        repository.deleteById(1L);
-        assertFalse(repository.findById(1L).isPresent());
+        repository.deleteById(2L);
+        assertFalse(repository.findById(2L).isPresent());
     }
 }
