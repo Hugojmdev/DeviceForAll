@@ -29,6 +29,6 @@ public abstract class AbstractRestController {
     }
 
     protected ResponseEntity<Void> deletedSuccessfully() {
-        return ResponseEntity.ok().build(); // or noContent()
+        return ResponseEntity.ok().build();
     }
 }
