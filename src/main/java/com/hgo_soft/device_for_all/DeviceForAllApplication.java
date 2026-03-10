@@ -1,9 +1,11 @@
 package com.hgo_soft.device_for_all;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@EnableAutoConfiguration
 public class DeviceForAllApplication {
 
 	public static void main(String[] args) {
