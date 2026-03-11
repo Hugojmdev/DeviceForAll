@@ -23,12 +23,11 @@ public class UserDetailRepositoryTest extends RepositoryTestSetup {
     @Test
     void testSave() {
         UserDetail userDetail = UserDetail.builder()
-                .email("test@email.com")
                 .firstName("Fred")
                 .lastName("Sanfield")
                 .build();
         UserDetail saved = repository.save(userDetail);
-        assertNotNull(saved.getId());
+        assertNotNull(saved.getUserId());
     }
 
     @Test

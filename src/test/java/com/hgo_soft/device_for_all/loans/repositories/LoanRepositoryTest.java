@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.loans.repositories;
 
 import com.hgo_soft.device_for_all.loans.entities.Loan;
+import com.hgo_soft.device_for_all.users.entities.User;
 import com.hgo_soft.device_for_all.users.entities.UserDetail;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
 import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
@@ -25,7 +26,7 @@ public class LoanRepositoryTest extends RepositoryTestSetup {
     @Test
     void testSave() {
         Loan loan = Loan.builder()
-                .userDetail(UserDetail.builder().id(1L).build())
+                .user(User.builder().id(1L).build())
                 .status(LoanStatus.REQUESTED)
                 .startDate(LocalDate.now())
                 .dueDate(LocalDate.now())

@@ -1,10 +1,11 @@
 package com.hgo_soft.device_for_all.users.controllers;
 
-import com.hgo_soft.device_for_all.users.dtos.PermissionDto;
-import com.hgo_soft.device_for_all.users.entities.Permission;
-import com.hgo_soft.device_for_all.users.mappers.PermissionMapper;
-import com.hgo_soft.device_for_all.users.mappers.PermissionMapperImpl;
-import com.hgo_soft.device_for_all.users.services.PermissionService;
+import com.hgo_soft.device_for_all.auth.controllers.PermissionController;
+import com.hgo_soft.device_for_all.auth.dtos.PermissionDto;
+import com.hgo_soft.device_for_all.auth.entities.Permission;
+import com.hgo_soft.device_for_all.auth.mappers.PermissionMapper;
+import com.hgo_soft.device_for_all.auth.mappers.PermissionMapperImpl;
+import com.hgo_soft.device_for_all.auth.services.PermissionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

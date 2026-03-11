@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class LoanCommentRepositoryTest extends RepositoryTestSetup {
         LoanComment loanComment = LoanComment.builder()
                 .comment("Test comment")
                 .loan(Loan.builder().id(1L).build())
-                .creationDate(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .build();
         LoanComment saved = repository.save(loanComment);
         assertNotNull(saved.getId());

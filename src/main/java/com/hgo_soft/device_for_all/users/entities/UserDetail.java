@@ -16,18 +16,25 @@ public class UserDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
-    private String fullName;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
 
+    @Column(nullable = false)
     private String firstName;
 
+    @Column(nullable = false)
     private String lastName;
-
-    @Column(unique = true)
-    private String email;
 
     private String phoneNumber;
 
     private String address;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
+
 }

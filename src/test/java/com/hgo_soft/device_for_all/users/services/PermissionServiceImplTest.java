@@ -1,8 +1,8 @@
 package com.hgo_soft.device_for_all.users.services;
 
-import com.hgo_soft.device_for_all.users.entities.Permission;
-import com.hgo_soft.device_for_all.users.repositories.PermissionRepository;
-import com.hgo_soft.device_for_all.users.services.impl.PermissionServiceImpl;
+import com.hgo_soft.device_for_all.auth.entities.Permission;
+import com.hgo_soft.device_for_all.auth.repositories.PermissionRepository;
+import com.hgo_soft.device_for_all.auth.services.impl.PermissionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;

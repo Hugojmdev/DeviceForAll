@@ -28,7 +28,7 @@ public class UserDetailServiceImplTest {
 
     @Test
     void testFindAll_ShouldReturnUserDetails() {
-        List<UserDetail> userDetails = Arrays.asList(UserDetail.builder().id(1L).build(), UserDetail.builder().id(2L).build());
+        List<UserDetail> userDetails = Arrays.asList(UserDetail.builder().userId(1L).build(), UserDetail.builder().userId(2L).build());
         when(repository.findAll()).thenReturn(userDetails);
 
         List<UserDetail> result = service.findAll();
@@ -39,13 +39,13 @@ public class UserDetailServiceImplTest {
 
     @Test
     void testFindById_WhenFound() {
-        UserDetail userDetail = UserDetail.builder().id(1L).build();
+        UserDetail userDetail = UserDetail.builder().userId(1L).build();
         when(repository.findById(1L)).thenReturn(Optional.of(userDetail));
 
         Optional<UserDetail> result = service.findById(1L);
 
         assertTrue(result.isPresent());
-        assertEquals(1L, result.get().getId());
+        assertEquals(1L, result.get().getUserId());
     }
 
     @Test
@@ -60,24 +60,24 @@ public class UserDetailServiceImplTest {
     @Test
     void testSave_ShouldReturnSavedUserDetail() {
         UserDetail toSave = new UserDetail();
-        UserDetail saved = UserDetail.builder().id(10L).build();
+        UserDetail saved = UserDetail.builder().userId(10L).build();
 
         when(repository.save(ArgumentMatchers.any())).thenReturn(saved);
 
         UserDetail result = service.save(toSave);
 
         assertNotNull(result);
-        assertEquals(10L, result.getId());
+        assertEquals(10L, result.getUserId());
     }
 
     @Test
     void testUpdate_ShouldReturnUpdatedUserDetail() {
-        UserDetail userDetail = UserDetail.builder().id(3L).build();
+        UserDetail userDetail = UserDetail.builder().userId(3L).build();
         when(repository.save(userDetail)).thenReturn(userDetail);
 
         UserDetail result = service.save(userDetail);
 
-        assertEquals(3L, result.getId());
+        assertEquals(3L, result.getUserId());
     }
 
     @Test
