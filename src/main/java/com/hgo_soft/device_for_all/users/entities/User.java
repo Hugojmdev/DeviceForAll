@@ -1,8 +1,13 @@
 package com.hgo_soft.device_for_all.users.entities;
 
+import com.hgo_soft.device_for_all.auth.entities.Role;
+import com.hgo_soft.device_for_all.loans.entities.Loan;
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,19 +25,33 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    /*@Column
+    private String password;*/
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @OneToOne
-    @JoinColumn(name = "user_detail_id", nullable = false, unique = true)
+    @Column(nullable = false)
+    private boolean enabled;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserDetail userDetail;
 
     @ManyToMany
     @JoinTable(
-            name = "user_permissions",
+            name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Permission> permissions;
+    private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Loan> loans = new ArrayList<>();
 
 }

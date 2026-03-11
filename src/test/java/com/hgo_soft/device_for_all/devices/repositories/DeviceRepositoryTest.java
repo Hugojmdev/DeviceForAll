@@ -1,8 +1,8 @@
 package com.hgo_soft.device_for_all.devices.repositories;
 
 import com.hgo_soft.device_for_all.devices.entities.Device;
+import com.hgo_soft.device_for_all.devices.entities.DeviceType;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
-import com.hgo_soft.device_for_all.devices.enums.DeviceType;
 import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class DeviceRepositoryTest extends RepositoryTestSetup {
     @Test
     public void testSave(){
         Device newDevice = Device.builder().id(1L)
-                .type(DeviceType.MEDIA_EQUIPMENT)
+                .deviceType(DeviceType.builder().build())
                 .status(DeviceStatus.AVAILABLE)
                 .build();
         Device savedDevice = repository.save(newDevice);
@@ -37,7 +37,7 @@ public class DeviceRepositoryTest extends RepositoryTestSetup {
                 .id(1L)
                 .serialNumber("SN123")
                 .model("X2023")
-                .type(DeviceType.MOBILE)
+                .deviceType(DeviceType.builder().build())
                 .status(DeviceStatus.AVAILABLE)
                 .build();
 
@@ -75,7 +75,7 @@ public class DeviceRepositoryTest extends RepositoryTestSetup {
                 .id(321L)
                 .serialNumber("SN321")
                 .model("M321")
-                .type(DeviceType.MEDIA_EQUIPMENT)
+                .deviceType(DeviceType.builder().build())
                 .status(DeviceStatus.AVAILABLE)
                 .build();
 

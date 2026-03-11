@@ -3,7 +3,7 @@ package com.hgo_soft.device_for_all.loans.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "loan_comments")
@@ -24,6 +24,6 @@ public class LoanComment {
     @Column(length = 250)
     private String comment;
 
-    @Column(name = "creation_date", nullable = false)
-    private LocalDate creationDate;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

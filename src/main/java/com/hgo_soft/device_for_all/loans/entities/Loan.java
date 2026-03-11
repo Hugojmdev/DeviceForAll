@@ -2,6 +2,7 @@ package com.hgo_soft.device_for_all.loans.entities;
 
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
+import com.hgo_soft.device_for_all.users.entities.User;
 import com.hgo_soft.device_for_all.users.entities.UserDetail;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,9 +22,10 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_detail_id", nullable = false)
-    private UserDetail userDetail; // can be student or teacher
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;

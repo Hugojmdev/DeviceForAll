@@ -1,7 +1,6 @@
 package com.hgo_soft.device_for_all.users.repositories;
 
-import com.hgo_soft.device_for_all.auth.entities.Permission;
-import com.hgo_soft.device_for_all.auth.repositories.PermissionRepository;
+import com.hgo_soft.device_for_all.users.entities.Department;
 import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,40 +11,38 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class PermissionRepositoryTest extends RepositoryTestSetup {
-
+public class DepartmentRepositoryTest extends RepositoryTestSetup {
     @Autowired
-    private PermissionRepository repository;
+    private DepartmentRepository repository;
 
     @Test
     void testSave() {
-        Permission permission = Permission.builder()
-                .name("EDIT_DEVICES")
+        Department department = Department.builder()
+                .id(1L)
+                .name("Philosophy")
                 .build();
-        Permission saved = repository.save(permission);
-
+        Department saved = repository.save(department);
         assertNotNull(saved.getId());
     }
 
     @Test
     void testFindById() {
-        Optional<Permission> result = repository.findById(1L);
+        Optional<Department> result = repository.findById(1L);
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
-        List<Permission> list = repository.findAll();
-        assertFalse(list.isEmpty());
+        List<Department> list = repository.findAll();
+        assertTrue(list.size() >= 1);
     }
 
     @Test
     void testDeleteById() {
-        repository.deleteById(2L);
-        assertFalse(repository.findById(2L).isPresent());
+        repository.deleteById(1L);
+        assertFalse(repository.findById(1L).isPresent());
     }
 }
