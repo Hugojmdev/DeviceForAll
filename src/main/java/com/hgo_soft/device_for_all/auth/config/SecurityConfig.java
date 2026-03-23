@@ -37,10 +37,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
+    /*@Bean
     CommandLineRunner generatePassword(PasswordEncoder encoder) {
         return args -> {
             System.out.println(encoder.encode("test"));
         };
-    }
+    }*/
 }

@@ -29,7 +29,7 @@ public class AuthController {
                 )
         );
 
-        String token = jwtService.generateToken(request.getUsername());
+        String token = jwtService.generateJwtToken(request.getUsername());
 
         return new AuthResponse(token);
     }
