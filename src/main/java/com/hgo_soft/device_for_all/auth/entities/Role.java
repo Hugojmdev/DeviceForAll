@@ -2,12 +2,18 @@ package com.hgo_soft.device_for_all.auth.entities;
 
 import com.hgo_soft.device_for_all.users.entities.User;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "roles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Role {
 
     @Id

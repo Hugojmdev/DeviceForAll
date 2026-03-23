@@ -31,8 +31,8 @@ INSERT INTO users (id, username, email, password_hash, enabled) VALUES
      (2, 'bobsmith01', 'bob@example.com', 'hash-pass', TRUE),
      (3, 'peter1', 'peter@example.com', 'hash-pass', TRUE);
 
--- 6. User Details
-INSERT INTO user_details (user_id, first_name, last_name, phone_number, address, department_id) VALUES
+-- 6. User Profiles
+INSERT INTO user_profiles (user_id, first_name, last_name, phone_number, address, department_id) VALUES
       (1, 'Alice', 'Johnson', '1234567890', '123 Elm St', 1),
       (2, 'Bob', 'Smith', '9876543210', '456 Oak Ave', 1),
       (3, 'Peter', 'Constanza', '1934040044', '4555 Chatam St', 1);

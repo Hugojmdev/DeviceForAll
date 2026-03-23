@@ -1,11 +1,13 @@
 package com.hgo_soft.device_for_all.users.services;
 
 import com.hgo_soft.device_for_all.users.entities.User;
+import com.hgo_soft.device_for_all.users.repositories.UserProfileRepository;
 import com.hgo_soft.device_for_all.users.repositories.UserRepository;
 import com.hgo_soft.device_for_all.users.services.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,12 +20,16 @@ import static org.mockito.Mockito.*;
 
 public class UserServiceImplTest {
     private UserRepository repository;
+    private UserProfileRepository userProfileRepository;
     private UserServiceImpl service;
+    private PasswordEncoder encoder;
 
     @BeforeEach
     void setUp() {
         repository = mock(UserRepository.class);
-        service = new UserServiceImpl(repository);
+        userProfileRepository = mock(UserProfileRepository.class);
+        //encoder = mock(PasswordEncoder.class);
+        service = new UserServiceImpl(repository, userProfileRepository, encoder);
     }
 
     @Test

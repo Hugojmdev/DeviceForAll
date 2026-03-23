@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,9 +29,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    /*@Column
-    private String password;*/
-
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -41,7 +39,7 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserDetail userDetail;
+    private UserProfile userProfile;
 
     @ManyToMany
     @JoinTable(
