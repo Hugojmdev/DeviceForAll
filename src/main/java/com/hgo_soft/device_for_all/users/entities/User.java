@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.users.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hgo_soft.device_for_all.auth.entities.Role;
 import com.hgo_soft.device_for_all.loans.entities.Loan;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -37,6 +39,13 @@ public class User {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    private void beforeInsert() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserProfile userProfile;

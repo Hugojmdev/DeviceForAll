@@ -1,4 +1,3 @@
-USE device_loans;
 
 -- 1. Roles
 INSERT INTO roles (id, name) VALUES
@@ -26,10 +25,10 @@ INSERT INTO departments (id, name, description) VALUES
     (1, 'Computer Science', 'Department of Computer Science');
 
 -- 5. Users
-INSERT INTO users (id, username, email, password_hash, enabled) VALUES
-     (1, 'alice123', 'alice@example.com', 'hashed-password', TRUE),
-     (2, 'bobsmith01', 'bob@example.com', 'hash-pass', TRUE),
-     (3, 'peter1', 'peter@example.com', 'hash-pass', TRUE);
+INSERT INTO users (id, username, email, password_hash, enabled, created_at) VALUES
+     (1, 'alice123', 'alice@example.com', 'hashed-password', TRUE, CURRENT_TIMESTAMP),
+     (2, 'bobsmith01', 'bob@example.com', 'hash-pass', TRUE, CURRENT_TIMESTAMP),
+     (3, 'peter1', 'peter@example.com', 'hash-pass', TRUE, CURRENT_TIMESTAMP);
 
 -- 6. User Profiles
 INSERT INTO user_profiles (user_id, first_name, last_name, phone_number, address, department_id) VALUES
@@ -61,8 +60,8 @@ INSERT INTO devices (id, name, serial_number, model, description, device_type_id
 
 -- 10. Loans
 INSERT INTO loans (id, user_id, start_date, due_date, request_date, extended_due_date, return_date, status) VALUES
-     (1, 2, CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY), DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY), NULL, NULL, 'APPROVED'),
-     (2, 1, CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY), DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY), NULL, NULL, 'APPROVED');
+     (1, 2, CURRENT_DATE, DATEADD('DAY', 7, CURRENT_DATE), DATEADD('DAY', -1, CURRENT_DATE), NULL, NULL, 'APPROVED'),
+     (2, 1, CURRENT_DATE, DATEADD('DAY', 7, CURRENT_DATE), DATEADD('DAY', -1, CURRENT_DATE), NULL, NULL, 'APPROVED');
 
 -- 11. Loan Devices
 INSERT INTO loan_devices (loan_id, device_id) VALUES
@@ -70,7 +69,7 @@ INSERT INTO loan_devices (loan_id, device_id) VALUES
      (2, 2);
 
 -- 12. Loan Comments
-INSERT INTO loan_comments (loan_id, comment) VALUES
-     (1, 'Loan approved and ready to pick up.');
+INSERT INTO loan_comments (loan_id, comment, created_at) VALUES
+     (1, 'Loan approved and ready to pick up.',CURRENT_TIMESTAMP    );
 
 

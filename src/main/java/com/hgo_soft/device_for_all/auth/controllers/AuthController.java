@@ -3,6 +3,7 @@ package com.hgo_soft.device_for_all.auth.controllers;
 import com.hgo_soft.device_for_all.auth.dtos.AuthResponse;
 import com.hgo_soft.device_for_all.auth.dtos.LoginRequest;
 import com.hgo_soft.device_for_all.auth.services.JwtService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,16 +21,16 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
 
-        String token = jwtService.generateJwtToken(request.getUsername());
+        String token = jwtService.generateJwtToken(request.username());
 
         return new AuthResponse(token);
     }
