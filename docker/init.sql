@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. User details (common info)
-CREATE TABLE IF NOT EXISTS user_details (
+-- 4. User profile (common info)
+CREATE TABLE IF NOT EXISTS user_profiles (
     user_id BIGINT PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,

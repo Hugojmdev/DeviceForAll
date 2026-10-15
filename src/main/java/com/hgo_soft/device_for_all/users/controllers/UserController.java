@@ -1,10 +1,16 @@
 package com.hgo_soft.device_for_all.users.controllers;
 
 import com.hgo_soft.device_for_all.common.api.AbstractRestController;
-import com.hgo_soft.device_for_all.users.dtos.UserDto;
+import com.hgo_soft.device_for_all.users.dtos.CreateUserRequest;
+import com.hgo_soft.device_for_all.users.dtos.UpdateUserRequest;
+import com.hgo_soft.device_for_all.users.dtos.UserResponse;
 import com.hgo_soft.device_for_all.users.mappers.UserMapper;
 import com.hgo_soft.device_for_all.users.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,27 +28,26 @@ public class UserController extends AbstractRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll() {
-        return okOrEmpty(mapper.toDtoList(service.findAll()));
+    public ResponseEntity<List<UserResponse>> getAll() {
+        return okOrEmpty(mapper.toUserResponseList(service.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return okOrNotFound(
-                service.findById(id).map(mapper::toDto)
+                service.findById(id).map(mapper::toUserResponse)
         );
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
-        UserDto saved = mapper.toDto(service.save(mapper.toEntity(userDto)));
-        return created("/api/users/" + saved.getId(), saved);
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest createUserRequest) {
+        UserResponse saved = mapper.toUserResponse(service.create(createUserRequest));
+        return created("/api/users/" + saved.id(), saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto userDto) {
-        userDto.setId(id);
-        UserDto updated = mapper.toDto(service.save(mapper.toEntity(userDto)));
+    public ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        UserResponse updated = mapper.toUserResponse(service.update(id, updateUserRequest));
         return okOrNotFound(updated);
     }
 
@@ -50,5 +55,17 @@ public class UserController extends AbstractRestController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
         return deletedSuccessfully();
+    }
+
+    @Secured("ROLE_VIEWER")
+    @GetMapping("/username")
+    public String getUsername() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        return context.getAuthentication().getName();
+    }
+
+    @Secured({"ROLE_VIEWER", "ROLE_EDITOR"})
+    public boolean isValidUsername(String username) {
+        return service.findByUsername(username).isPresent();
     }
 }

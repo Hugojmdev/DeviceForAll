@@ -1,7 +1,6 @@
 package com.hgo_soft.device_for_all.users.repositories;
 
 import com.hgo_soft.device_for_all.users.entities.User;
-import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -14,33 +13,65 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class UserRepositoryTest extends RepositoryTestSetup {
+public class UserRepositoryTest {
 
     @Autowired
     private UserRepository repository;
 
     @Test
     void testSave() {
-        User user = User.builder().id(1L).build();
-        User saved = repository.save(user);
+        User saved = repository.saveAndFlush(createUser("save"));
+
         assertNotNull(saved.getId());
     }
 
     @Test
+    void testSave_ShouldSetCreatedAtBeforeInsert() {
+        User user = createUser("created-at");
+
+        assertNull(user.getCreatedAt());
+
+        User saved = repository.saveAndFlush(user);
+
+        assertNotNull(saved.getCreatedAt());
+    }
+
+    @Test
     void testFindById() {
-        Optional<User> result = repository.findById(1L);
+        User saved = repository.saveAndFlush(createUser("find"));
+
+        Optional<User> result = repository.findById(saved.getId());
+
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
+        repository.save(createUser("first"));
+        repository.save(createUser("second"));
+        repository.flush();
+
         List<User> list = repository.findAll();
-        assertTrue(list.size() >= 2);
+
+        assertEquals(2, list.size());
     }
 
     @Test
     void testDeleteById() {
-        repository.deleteById(1L);
-        assertFalse(repository.findById(1L).isPresent());
+        User saved = repository.saveAndFlush(createUser("delete"));
+
+        repository.deleteById(saved.getId());
+        repository.flush();
+
+        assertFalse(repository.findById(saved.getId()).isPresent());
+    }
+
+    private User createUser(String suffix) {
+        return User.builder()
+                .username("user-" + suffix)
+                .email(suffix + "@example.com")
+                .passwordHash("hashed-password")
+                .enabled(true)
+                .build();
     }
 }
