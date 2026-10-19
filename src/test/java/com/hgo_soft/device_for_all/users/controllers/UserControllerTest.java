@@ -1,6 +1,6 @@
 package com.hgo_soft.device_for_all.users.controllers;
 
-import com.hgo_soft.device_for_all.common.exceptions.GlobalExceptionHandler;
+import com.hgo_soft.device_for_all.common.exceptions.handlers.GlobalExceptionHandler;
 import com.hgo_soft.device_for_all.common.exceptions.ResourceNotFoundException;
 import com.hgo_soft.device_for_all.users.dtos.CreateUserRequest;
 import com.hgo_soft.device_for_all.users.dtos.UpdateUserRequest;

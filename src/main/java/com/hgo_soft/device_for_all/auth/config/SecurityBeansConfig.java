@@ -12,12 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityBeansConfig {
 
-    //private final UserDetailsService userDetailsService;
-
-    /*public SecurityBeansConfig(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }*/
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -35,7 +29,6 @@ public class SecurityBeansConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
-
         return config.getAuthenticationManager();
     }
 }
