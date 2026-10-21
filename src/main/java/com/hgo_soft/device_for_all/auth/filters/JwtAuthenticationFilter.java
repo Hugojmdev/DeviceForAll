@@ -69,7 +69,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if(SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
+
                 if(!jwtService.isTokenValid(jwt, userDetails.getUsername())){
+                    authenticationEntryPoint.sendUnauthorized(request, response, "Invalid Token!!!");
+                    return;
+                }
+
+                if(!userDetails.isEnabled()) {
                     authenticationEntryPoint.sendUnauthorized(request, response, "Invalid Token!!!");
                     return;
                 }

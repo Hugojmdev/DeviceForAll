@@ -120,4 +120,30 @@ public class JwtAuthenticationFilterTest {
         verify(filterChain).doFilter(request, response);
         verifyNoMoreInteractions(jwtService);
     }
+
+    @Test
+    void validTokenForDisabledUser_returnUnauthorized() throws Exception {
+        MockHttpServletRequest request = protectedRequest();
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer valid-token");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain filterChain = mock(FilterChain.class);
+
+        UserDetails disabledUserDetails = User
+                .withUsername("disabled-user")
+                .password("disabled-password")
+                .authorities("ROLE_VIEWER")
+                .disabled(true)
+                .build();
+
+        when(jwtService.extractUsername("valid-token")).thenReturn("disabled-user");
+        when(securityUserDetailsService.loadUserByUsername("disabled-user")).thenReturn(disabledUserDetails);
+        when(jwtService.isTokenValid("valid-token", "disabled-user")).thenReturn(true);
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        assertEquals(401,response.getStatus());
+        assertEquals("Invalid Token!!!",
+                objectMapper.readTree(response.getContentAsString()).get("message").asText());
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain, never()).doFilter(any(), any());
+    }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
@@ -102,6 +103,21 @@ class AuthControllerTest {
 
         assertEquals(1, jwtService.generationCount);
         assertEquals("alice", jwtService.lastUsername);
+    }
+
+    @Test
+    void login_whenUserIsDisabled_ReturnsApiError() throws Exception {
+        when(authenticationManager.authenticate(any(Authentication.class)))
+                .thenThrow(new DisabledException("User is disabled!!!"));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequest("disabled-user", "disabled-password")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid Credentials!!!"));
+
+        assertEquals(0, jwtService.generationCount);
     }
 
     private String loginRequest(String username, String password) {
