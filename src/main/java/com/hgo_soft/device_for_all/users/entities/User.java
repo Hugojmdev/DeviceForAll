@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.users.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hgo_soft.device_for_all.auth.entities.Role;
 import com.hgo_soft.device_for_all.loans.entities.Loan;
 import jakarta.persistence.*;
@@ -11,7 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,9 +30,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    /*@Column
-    private String password;*/
-
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
@@ -40,8 +40,12 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserDetail userDetail;
+    @PrePersist
+    private void beforeInsert() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 
     @ManyToMany
     @JoinTable(
@@ -49,9 +53,11 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Loan> loans = new ArrayList<>();
 
 }

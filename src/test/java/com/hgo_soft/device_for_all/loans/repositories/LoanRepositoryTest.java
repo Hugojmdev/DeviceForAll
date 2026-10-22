@@ -2,7 +2,6 @@ package com.hgo_soft.device_for_all.loans.repositories;
 
 import com.hgo_soft.device_for_all.loans.entities.Loan;
 import com.hgo_soft.device_for_all.users.entities.User;
-import com.hgo_soft.device_for_all.users.entities.UserDetail;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
 import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;

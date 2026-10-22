@@ -1,8 +1,8 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
 
+import com.hgo_soft.device_for_all.auth.dtos.PermissionResponse;
 import com.hgo_soft.device_for_all.common.api.AbstractRestController;
-import com.hgo_soft.device_for_all.auth.dtos.PermissionDto;
 import com.hgo_soft.device_for_all.auth.mappers.PermissionMapper;
 import com.hgo_soft.device_for_all.auth.services.PermissionService;
 import org.springframework.http.ResponseEntity;
@@ -22,33 +22,14 @@ public class PermissionController extends AbstractRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PermissionDto>> getAll() {
-        return okOrEmpty(mapper.toDtoList(service.findAll()));
+    public ResponseEntity<List<PermissionResponse>> getAll() {
+        return okOrEmpty(mapper.toResponseList(service.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PermissionDto> getById(@PathVariable Long id) {
+    public ResponseEntity<PermissionResponse> getById(@PathVariable Long id) {
         return okOrNotFound(
-                service.findById(id).map(mapper::toDto)
+                service.findById(id).map(mapper::toResponse)
         );
-    }
-
-    @PostMapping
-    public ResponseEntity<PermissionDto> create(@RequestBody PermissionDto permissionDto) {
-        PermissionDto saved = mapper.toDto(service.save(mapper.toEntity(permissionDto)));
-        return created("/api/permissions/" + saved.getId(), saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PermissionDto> update(@PathVariable Long id, @RequestBody PermissionDto permissionDto) {
-        permissionDto.setId(id);
-        PermissionDto updated = mapper.toDto(service.save(mapper.toEntity(permissionDto)));
-        return okOrNotFound(updated);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return deletedSuccessfully();
     }
 }

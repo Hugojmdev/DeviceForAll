@@ -23,16 +23,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Optional<Role> findById(Long id) {
-        return repository.findById(Math.toIntExact(id));
-    }
-
-    @Override
-    public Role save(Role entity) {
-        return repository.save(entity);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        repository.deleteById(Math.toIntExact(id));
+        return repository.findById(id);
     }
 }

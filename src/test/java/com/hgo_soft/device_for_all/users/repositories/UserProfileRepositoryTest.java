@@ -1,6 +1,6 @@
 package com.hgo_soft.device_for_all.users.repositories;
 
-import com.hgo_soft.device_for_all.users.entities.UserDetail;
+import com.hgo_soft.device_for_all.users.entities.UserProfile;
 import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,30 +15,30 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class UserDetailRepositoryTest extends RepositoryTestSetup {
+public class UserProfileRepositoryTest extends RepositoryTestSetup {
 
     @Autowired
-    private UserDetailRepository repository;
+    private UserProfileRepository repository;
 
     @Test
     void testSave() {
-        UserDetail userDetail = UserDetail.builder()
+        UserProfile userProfile = UserProfile.builder()
                 .firstName("Fred")
                 .lastName("Sanfield")
                 .build();
-        UserDetail saved = repository.save(userDetail);
+        UserProfile saved = repository.save(userProfile);
         assertNotNull(saved.getUserId());
     }
 
     @Test
     void testFindById() {
-        Optional<UserDetail> result = repository.findById(3L);
+        Optional<UserProfile> result = repository.findById(3L);
         assertTrue(result.isPresent());
     }
 
     @Test
     void testFindAll() {
-        List<UserDetail> list = repository.findAll();
+        List<UserProfile> list = repository.findAll();
         assertFalse(list.isEmpty());
     }
 

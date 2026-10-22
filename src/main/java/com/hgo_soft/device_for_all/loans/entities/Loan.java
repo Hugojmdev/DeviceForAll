@@ -3,7 +3,6 @@ package com.hgo_soft.device_for_all.loans.entities;
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
 import com.hgo_soft.device_for_all.users.entities.User;
-import com.hgo_soft.device_for_all.users.entities.UserDetail;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "loans")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

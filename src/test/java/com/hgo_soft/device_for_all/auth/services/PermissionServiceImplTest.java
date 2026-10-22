@@ -1,11 +1,10 @@
-package com.hgo_soft.device_for_all.users.services;
+package com.hgo_soft.device_for_all.auth.services;
 
 import com.hgo_soft.device_for_all.auth.entities.Permission;
 import com.hgo_soft.device_for_all.auth.repositories.PermissionRepository;
 import com.hgo_soft.device_for_all.auth.services.impl.PermissionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class PermissionServiceImplTest {
@@ -55,37 +53,5 @@ public class PermissionServiceImplTest {
         Optional<Permission> result = service.findById(999L);
 
         assertFalse(result.isPresent());
-    }
-
-    @Test
-    void testSave_ShouldReturnSavedPermission() {
-        Permission toSave = new Permission();
-        Permission saved = Permission.builder().id(10L).build();
-
-        when(repository.save(ArgumentMatchers.any())).thenReturn(saved);
-
-        Permission result = service.save(toSave);
-
-        assertNotNull(result);
-        assertEquals(10L, result.getId());
-    }
-
-    @Test
-    void testUpdate_ShouldReturnUpdatedPermission() {
-        Permission permission = Permission.builder().id(3L).build();
-        when(repository.save(permission)).thenReturn(permission);
-
-        Permission result = service.save(permission);
-
-        assertEquals(3L, result.getId());
-    }
-
-    @Test
-    void testDeleteById() {
-        doNothing().when(repository).deleteById(5L);
-
-        service.deleteById(5L);
-
-        verify(repository, times(1)).deleteById(5L);
     }
 }

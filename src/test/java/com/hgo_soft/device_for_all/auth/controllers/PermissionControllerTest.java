@@ -1,7 +1,6 @@
-package com.hgo_soft.device_for_all.users.controllers;
+package com.hgo_soft.device_for_all.auth.controllers;
 
-import com.hgo_soft.device_for_all.auth.controllers.PermissionController;
-import com.hgo_soft.device_for_all.auth.dtos.PermissionDto;
+import com.hgo_soft.device_for_all.auth.dtos.PermissionResponse;
 import com.hgo_soft.device_for_all.auth.entities.Permission;
 import com.hgo_soft.device_for_all.auth.mappers.PermissionMapper;
 import com.hgo_soft.device_for_all.auth.mappers.PermissionMapperImpl;
@@ -38,7 +37,7 @@ public class PermissionControllerTest {
         );
         when(service.findAll()).thenReturn(permissions);
 
-        ResponseEntity<List<PermissionDto>> response = controller.getAll();
+        ResponseEntity<List<PermissionResponse>> response = controller.getAll();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -48,7 +47,7 @@ public class PermissionControllerTest {
 
     @Test
     void testGetAll_ShouldReturnNoContent() {
-        ResponseEntity<List<PermissionDto>> response = controller.getAll();
+        ResponseEntity<List<PermissionResponse>> response = controller.getAll();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -58,56 +57,23 @@ public class PermissionControllerTest {
     @Test
     void testGetById_Found() {
         long id = 1L;
-        PermissionDto inputDto = PermissionDto.builder().id(id).build();
         Permission entityToFound = Permission.builder().id(id).build();
         when(service.findById(any())).thenReturn(Optional.of(entityToFound));
 
-        ResponseEntity<PermissionDto> response = controller.getById(id);
+        ResponseEntity<PermissionResponse> response = controller.getById(id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
+        assertEquals(id, response.getBody().id());
     }
 
     @Test
     void testGetById_NotFound() {
         when(service.findById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<PermissionDto> response = controller.getById(999L);
+        ResponseEntity<PermissionResponse> response = controller.getById(999L);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-    @Test
-    void testCreate_ShouldReturnCreatedPermission() {
-        long id = 10L;
-        PermissionDto inputDto = new PermissionDto();
-        Permission savedEntity = Permission.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<PermissionDto> response = controller.create(inputDto);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("/api/permissions/10", Objects.requireNonNull(response.getHeaders().getLocation()).toString());
-    }
-
-    @Test
-    void testUpdate_ShouldReturnUpdatedPermission() {
-        Long id = 5L;
-        PermissionDto inputDto = PermissionDto.builder().id(id).build();
-        Permission savedEntity = Permission.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<PermissionDto> response = controller.update(id, inputDto);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
-    }
-
-    @Test
-    void testDelete_ShouldReturnOk() {
-        doNothing().when(service).deleteById(1L);
-
-        ResponseEntity<Void> response = controller.delete(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(service).deleteById(1L);
-    }
 }

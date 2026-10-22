@@ -1,4 +1,4 @@
-package com.hgo_soft.device_for_all.auth.dtos;
+package com.hgo_soft.device_for_all.users.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoleDto {
+public class UserProfileDto {
+
     private Long id;
-    private String name;
 }

@@ -8,6 +8,4 @@ import java.util.Optional;
 public interface PermissionService {
     List<Permission> findAll();
     Optional<Permission> findById(Long id);
-    Permission save(Permission entity);
-    void deleteById(Long id);
 }
