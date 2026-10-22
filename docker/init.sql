@@ -62,6 +62,82 @@ CREATE TABLE IF NOT EXISTS role_permissions (
     FOREIGN KEY (permission_id) REFERENCES permissions(id)
 );
 
+-- Access-control seed data
+INSERT IGNORE INTO roles (name) VALUES
+    ('ADMIN'),
+    ('SUPERVISOR'),
+    ('STAFF'),
+    ('BORROWER');
+
+INSERT IGNORE INTO permissions (name) VALUES
+    ('DEVICE_READ'),
+    ('DEVICE_CREATE'),
+    ('DEVICE_UPDATE'),
+    ('DEVICE_RETIRE'),
+    ('LOAN_CREATE_OWN'),
+    ('LOAN_READ_OWN'),
+    ('LOAN_CANCEL_OWN'),
+    ('LOAN_READ_ALL'),
+    ('LOAN_APPROVE'),
+    ('LOAN_REJECT'),
+    ('LOAN_CHECK_OUT'),
+    ('LOAN_RETURN_PROCESS'),
+    ('LOAN_EXTEND'),
+    ('LOAN_PENALTY_WAIVE'),
+    ('USER_READ'),
+    ('USER_CONTACT_UPDATE'),
+    ('USER_BORROWING_STATUS_MANAGE'),
+    ('USER_ACCOUNT_STATUS_MANAGE'),
+    ('ACCESS_MANAGE');
+
+-- BORROWER permissions
+INSERT IGNORE INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON p.name IN (
+    'DEVICE_READ',
+    'LOAN_CREATE_OWN',
+    'LOAN_READ_OWN',
+    'LOAN_CANCEL_OWN'
+)
+WHERE r.name = 'BORROWER';
+
+-- STAFF permissions
+INSERT IGNORE INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON p.name IN (
+    'DEVICE_READ',
+    'DEVICE_CREATE',
+    'DEVICE_UPDATE',
+    'LOAN_CREATE_OWN',
+    'LOAN_READ_OWN',
+    'LOAN_CANCEL_OWN',
+    'LOAN_READ_ALL',
+    'LOAN_APPROVE',
+    'LOAN_REJECT',
+    'LOAN_CHECK_OUT',
+    'LOAN_RETURN_PROCESS',
+    'LOAN_EXTEND',
+    'USER_READ'
+)
+WHERE r.name = 'STAFF';
+
+-- SUPERVISOR permissions
+INSERT IGNORE INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'SUPERVISOR'
+  AND p.name <> 'ACCESS_MANAGE';
+
+-- ADMIN permissions
+INSERT IGNORE INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'ADMIN';
+
 -- 8. Device types
 CREATE TABLE IF NOT EXISTS device_types (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -81,10 +157,10 @@ CREATE TABLE IF NOT EXISTS devices (
     FOREIGN KEY (device_type_id) REFERENCES device_types(id)
 );
 
--- 10. Loans (for students or teachers)
+-- 10. Loans for borrowers
 CREATE TABLE IF NOT EXISTS loans (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL, -- reference to user, can be student or teacher
+    user_id BIGINT NOT NULL,
     start_date DATE NOT NULL,
     due_date DATE NOT NULL,
     request_date DATE,
@@ -94,7 +170,7 @@ CREATE TABLE IF NOT EXISTS loans (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 11. Loan devices (for students or teachers)
+-- 11. Loan devices
 CREATE TABLE IF NOT EXISTS loan_devices (
     loan_id BIGINT NOT NULL,
     device_id BIGINT NOT NULL,

@@ -1,24 +1,76 @@
 
 -- 1. Roles
 INSERT INTO roles (id, name) VALUES
-   (1, 'ADMIN'),
-   (2, 'TEACHER'),
-   (3, 'STUDENT');
+    (1, 'ADMIN'),
+    (2, 'SUPERVISOR'),
+    (3, 'STAFF'),
+    (4, 'BORROWER');
 
 -- 2. Permissions
 INSERT INTO permissions (id, name) VALUES
-   (1, 'VIEW_DEVICES'),
-   (2, 'BORROW_DEVICE'),
-   (3, 'MANAGE_DEVICES');
+    (1, 'DEVICE_READ'),
+    (2, 'DEVICE_CREATE'),
+    (3, 'DEVICE_UPDATE'),
+    (4, 'DEVICE_RETIRE'),
+    (5, 'LOAN_CREATE_OWN'),
+    (6, 'LOAN_READ_OWN'),
+    (7, 'LOAN_CANCEL_OWN'),
+    (8, 'LOAN_READ_ALL'),
+    (9, 'LOAN_APPROVE'),
+    (10, 'LOAN_REJECT'),
+    (11, 'LOAN_CHECK_OUT'),
+    (12, 'LOAN_RETURN_PROCESS'),
+    (13, 'LOAN_EXTEND'),
+    (14, 'LOAN_PENALTY_WAIVE'),
+    (15, 'USER_READ'),
+    (16, 'USER_CONTACT_UPDATE'),
+    (17, 'USER_BORROWING_STATUS_MANAGE'),
+    (18, 'USER_ACCOUNT_STATUS_MANAGE'),
+    (19, 'ACCESS_MANAGE');
 
 -- 3. Role Permissions
-INSERT INTO role_permissions (role_id, permission_id) VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3),
-    (2, 1),
-    (2, 2),
-    (3, 1);
+
+-- ADMIN
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT 1, id
+FROM permissions;
+
+-- SUPERVISOR
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT 2, id
+FROM permissions
+WHERE name <> 'ACCESS_MANAGE';
+
+-- STAFF
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT 3, id
+FROM permissions
+WHERE name IN (
+    'DEVICE_READ',
+    'DEVICE_CREATE',
+    'DEVICE_UPDATE',
+    'LOAN_CREATE_OWN',
+    'LOAN_READ_OWN',
+    'LOAN_CANCEL_OWN',
+    'LOAN_READ_ALL',
+    'LOAN_APPROVE',
+    'LOAN_REJECT',
+    'LOAN_CHECK_OUT',
+    'LOAN_RETURN_PROCESS',
+    'LOAN_EXTEND',
+    'USER_READ'
+);
+
+-- BORROWER
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT 4, id
+FROM permissions
+WHERE name IN (
+    'DEVICE_READ',
+    'LOAN_CREATE_OWN',
+    'LOAN_READ_OWN',
+    'LOAN_CANCEL_OWN'
+);
 
 -- 4. Departments
 INSERT INTO departments (id, name, description) VALUES
@@ -39,8 +91,8 @@ INSERT INTO user_profiles (user_id, first_name, last_name, phone_number, address
 -- 7. User Roles
 INSERT INTO user_roles (user_id, role_id) VALUES
       (1, 1),
-      (2, 2),
-      (3, 3);
+      (2, 3),
+      (3, 4);
 
 -- 8. Device Types
 INSERT INTO device_types (id, name, description) VALUES
