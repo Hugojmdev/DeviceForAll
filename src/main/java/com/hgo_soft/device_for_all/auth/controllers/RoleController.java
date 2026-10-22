@@ -1,6 +1,6 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
-import com.hgo_soft.device_for_all.auth.dtos.RoleDto;
+import com.hgo_soft.device_for_all.auth.dtos.RoleResponse;
 import com.hgo_soft.device_for_all.auth.mappers.RoleMapper;
 import com.hgo_soft.device_for_all.auth.services.RoleService;
 import com.hgo_soft.device_for_all.common.api.AbstractRestController;
@@ -21,33 +21,14 @@ public class RoleController extends AbstractRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoleDto>> getAll() {
-        return okOrEmpty(mapper.toDtoList(service.findAll()));
+    public ResponseEntity<List<RoleResponse>> getAll() {
+        return okOrEmpty(mapper.toResponseList(service.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> getById(@PathVariable Long id) {
+    public ResponseEntity<RoleResponse> getById(@PathVariable Long id) {
         return okOrNotFound(
-                service.findById(id).map(mapper::toDto)
+                service.findById(id).map(mapper::toResponse)
         );
-    }
-
-    @PostMapping
-    public ResponseEntity<RoleDto> create(@RequestBody RoleDto roleDto) {
-        RoleDto saved = mapper.toDto(service.save(mapper.toEntity(roleDto)));
-        return created("/api/roles/" + saved.getId(), saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<RoleDto> update(@PathVariable Long id, @RequestBody RoleDto roleDto) {
-        roleDto.setId(id);
-        RoleDto updated = mapper.toDto(service.save(mapper.toEntity(roleDto)));
-        return okOrNotFound(updated);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return deletedSuccessfully();
     }
 }

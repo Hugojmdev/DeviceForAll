@@ -25,14 +25,4 @@ public class PermissionServiceImpl implements PermissionService {
     public Optional<Permission> findById(Long id) {
         return repository.findById(id);
     }
-
-    @Override
-    public Permission save(Permission entity) {
-        return repository.save(entity);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        repository.deleteById(id);
-    }
 }

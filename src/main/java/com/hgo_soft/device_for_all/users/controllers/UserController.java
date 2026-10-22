@@ -8,9 +8,6 @@ import com.hgo_soft.device_for_all.users.mappers.UserMapper;
 import com.hgo_soft.device_for_all.users.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,17 +52,5 @@ public class UserController extends AbstractRestController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
         return deletedSuccessfully();
-    }
-
-    @Secured("ROLE_VIEWER")
-    @GetMapping("/username")
-    public String getUsername() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        return context.getAuthentication().getName();
-    }
-
-    @Secured({"ROLE_VIEWER", "ROLE_EDITOR"})
-    public boolean isValidUsername(String username) {
-        return service.findByUsername(username).isPresent();
     }
 }

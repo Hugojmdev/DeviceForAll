@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.users.controllers;
 
+
 import com.hgo_soft.device_for_all.common.exceptions.handlers.GlobalExceptionHandler;
 import com.hgo_soft.device_for_all.common.exceptions.ResourceNotFoundException;
 import com.hgo_soft.device_for_all.users.dtos.CreateUserRequest;
@@ -24,8 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class UserControllerTest {
     
@@ -142,7 +142,8 @@ public class UserControllerTest {
                                 }
                                 """))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User not found"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Resource Not Found!!!"));
 
         verify(service).update(id, request);
     }
