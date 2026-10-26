@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractRestController {
+
     protected <T> ResponseEntity<T> okOrNotFound(T body) {
         return body == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(body);
     }

@@ -1,15 +1,17 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
-import com.hgo_soft.device_for_all.auth.dtos.RoleDto;
+import com.hgo_soft.device_for_all.auth.dtos.RoleResponse;
 import com.hgo_soft.device_for_all.auth.mappers.RoleMapper;
 import com.hgo_soft.device_for_all.auth.services.RoleService;
 import com.hgo_soft.device_for_all.common.api.AbstractRestController;
+import com.hgo_soft.device_for_all.common.security.SecuredRestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@SecuredRestController
 @RequestMapping("/api/roles")
 public class RoleController extends AbstractRestController {
     private final RoleService service;
@@ -20,34 +22,17 @@ public class RoleController extends AbstractRestController {
         this.mapper = mapper;
     }
 
+    @PreAuthorize("hasAuthority('ACCESS_MANAGE')")
     @GetMapping
-    public ResponseEntity<List<RoleDto>> getAll() {
-        return okOrEmpty(mapper.toDtoList(service.findAll()));
+    public ResponseEntity<List<RoleResponse>> getAll() {
+        return okOrEmpty(mapper.toResponseList(service.findAll()));
     }
 
+    @PreAuthorize("hasAuthority('ACCESS_MANAGE')")
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> getById(@PathVariable Long id) {
+    public ResponseEntity<RoleResponse> getById(@PathVariable Long id) {
         return okOrNotFound(
-                service.findById(id).map(mapper::toDto)
+                service.findById(id).map(mapper::toResponse)
         );
-    }
-
-    @PostMapping
-    public ResponseEntity<RoleDto> create(@RequestBody RoleDto roleDto) {
-        RoleDto saved = mapper.toDto(service.save(mapper.toEntity(roleDto)));
-        return created("/api/roles/" + saved.getId(), saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<RoleDto> update(@PathVariable Long id, @RequestBody RoleDto roleDto) {
-        roleDto.setId(id);
-        RoleDto updated = mapper.toDto(service.save(mapper.toEntity(roleDto)));
-        return okOrNotFound(updated);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return deletedSuccessfully();
     }
 }

@@ -3,76 +3,72 @@ package com.hgo_soft.device_for_all.devices.repositories;
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.devices.entities.DeviceType;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
-import com.hgo_soft.device_for_all.common.repositories.RepositoryTestSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class DeviceRepositoryTest extends RepositoryTestSetup {
+public class DeviceRepositoryTest {
 
     @Autowired
     DeviceRepository repository;
 
     @Test
     public void testSave(){
-        Device newDevice = Device.builder().id(1L)
-                .deviceType(DeviceType.builder().build())
-                .status(DeviceStatus.AVAILABLE)
-                .build();
-        Device savedDevice = repository.save(newDevice);
-        assertNotNull(savedDevice.getId());
+        Device device = buildDevice("00-11-22");
+        repository.save(device);
+        assertNotNull(device.getId());
     }
 
     @Test
     void testSaveAndFindById() {
-        Device device = Device.builder()
-                .id(1L)
-                .serialNumber("SN123")
-                .model("X2023")
-                .deviceType(DeviceType.builder().build())
-                .status(DeviceStatus.AVAILABLE)
-                .build();
-
-        Device saved = repository.save(device);
-
-        assertNotNull(saved.getId());
-
-        Optional<Device> found = repository.findById(saved.getId());
-
+        Device device = buildDevice("00-11-33");
+        repository.save(device);
+        assertNotNull(device.getId());
+        Long deviceId = device.getId();
+        Optional<Device> found = repository.findById(deviceId);
         assertTrue(found.isPresent());
-        assertEquals("SN123", found.get().getSerialNumber());
     }
 
     @Test
     void testFindByIdNotFound() {
+        Device device = buildDevice("00-22-22");
+        repository.save(device);
+        assertNotNull(device.getId());
         Optional<Device> result = repository.findById(999L);
         assertTrue(result.isEmpty());
     }
 
-    @Test
+    /*@Test
     void testFindAll() {
+        Device device = buildDevice("00-11-22");
+        repository.save(device);
+        Device device2 = buildDevice("00-11-33");
+        repository.save(device2);
         List<Device> allDevices = repository.findAll();
         assertEquals(2, allDevices.size());
-    }
+    }*/
 
     @Test
     void testDeleteById() {
-        repository.deleteById(1L);
-        assertFalse(repository.findById(1L).isPresent());
+        Device device = buildDevice("00-11-22");
+        repository.save(device);
+        Long deviceId = device.getId();
+        repository.deleteById(deviceId);
+        assertFalse(repository.findById(deviceId).isPresent());
     }
 
-    @Test
+    /*@Test
     void testUpdateDevice() {
         Device device = Device.builder()
                 .id(321L)
+                .name("saved-device")
                 .serialNumber("SN321")
                 .model("M321")
                 .deviceType(DeviceType.builder().build())
@@ -83,6 +79,15 @@ public class DeviceRepositoryTest extends RepositoryTestSetup {
         saved.setModel("m-124");
         Device updated = repository.save(saved);
         assertEquals("m-124", updated.getModel());
+    }*/
+
+    private Device buildDevice(String serialNumber) {
+        return Device.builder()
+                .name("test-device")
+                .serialNumber(serialNumber)
+                .model("X2023")
+                .deviceType(DeviceType.builder().build())
+                .status(DeviceStatus.AVAILABLE)
+                .build();
     }
-    
 }

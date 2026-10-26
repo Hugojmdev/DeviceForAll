@@ -1,16 +1,18 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
 
+import com.hgo_soft.device_for_all.auth.dtos.PermissionResponse;
 import com.hgo_soft.device_for_all.common.api.AbstractRestController;
-import com.hgo_soft.device_for_all.auth.dtos.PermissionDto;
 import com.hgo_soft.device_for_all.auth.mappers.PermissionMapper;
 import com.hgo_soft.device_for_all.auth.services.PermissionService;
+import com.hgo_soft.device_for_all.common.security.SecuredRestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@SecuredRestController
 @RequestMapping("/api/permissions")
 public class PermissionController extends AbstractRestController {
     private final PermissionService service;
@@ -21,34 +23,17 @@ public class PermissionController extends AbstractRestController {
         this.mapper = mapper;
     }
 
+    @PreAuthorize("hasAuthority('ACCESS_MANAGE')")
     @GetMapping
-    public ResponseEntity<List<PermissionDto>> getAll() {
-        return okOrEmpty(mapper.toDtoList(service.findAll()));
+    public ResponseEntity<List<PermissionResponse>> getAll() {
+        return okOrEmpty(mapper.toResponseList(service.findAll()));
     }
 
+    @PreAuthorize("hasAuthority('ACCESS_MANAGE')")
     @GetMapping("/{id}")
-    public ResponseEntity<PermissionDto> getById(@PathVariable Long id) {
+    public ResponseEntity<PermissionResponse> getById(@PathVariable Long id) {
         return okOrNotFound(
-                service.findById(id).map(mapper::toDto)
+                service.findById(id).map(mapper::toResponse)
         );
-    }
-
-    @PostMapping
-    public ResponseEntity<PermissionDto> create(@RequestBody PermissionDto permissionDto) {
-        PermissionDto saved = mapper.toDto(service.save(mapper.toEntity(permissionDto)));
-        return created("/api/permissions/" + saved.getId(), saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PermissionDto> update(@PathVariable Long id, @RequestBody PermissionDto permissionDto) {
-        permissionDto.setId(id);
-        PermissionDto updated = mapper.toDto(service.save(mapper.toEntity(permissionDto)));
-        return okOrNotFound(updated);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return deletedSuccessfully();
     }
 }

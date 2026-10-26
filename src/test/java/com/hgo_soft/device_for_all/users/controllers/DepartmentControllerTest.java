@@ -1,114 +1,151 @@
 package com.hgo_soft.device_for_all.users.controllers;
 
-import com.hgo_soft.device_for_all.users.dtos.DepartmentDto;
+import com.hgo_soft.device_for_all.auth.filters.JwtAuthenticationFilter;
+import com.hgo_soft.device_for_all.common.security.WebMvcSecurityTestConfiguration;
 import com.hgo_soft.device_for_all.users.entities.Department;
-import com.hgo_soft.device_for_all.users.mappers.DepartmentMapper;
 import com.hgo_soft.device_for_all.users.mappers.DepartmentMapperImpl;
 import com.hgo_soft.device_for_all.users.services.DepartmentService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DepartmentControllerTest {
+@WebMvcTest(
+        controllers = DepartmentController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class
+        )
+)
+@Import({WebMvcSecurityTestConfiguration.class, DepartmentMapperImpl.class})
+class DepartmentControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private DepartmentService service;
-    private DepartmentController controller;
-
-    @BeforeEach
-    void setUp() {
-        service = mock(DepartmentService.class);
-        DepartmentMapper mapper = new DepartmentMapperImpl();
-        controller = new DepartmentController(service, mapper);
-    }
 
     @Test
-    void testGetAll_ShouldReturnListOfDepartments() {
-        List<Department> departments = Arrays.asList(
+    @WithMockUser(authorities = "USER_READ")
+    void getAll_returnsDepartments() throws Exception {
+        when(service.findAll()).thenReturn(List.of(
                 Department.builder().id(1L).build(),
                 Department.builder().id(2L).build()
-        );
+        ));
 
-        when(service.findAll()).thenReturn(departments);
+        mockMvc.perform(get("/api/departments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
 
-        ResponseEntity<List<DepartmentDto>> response = controller.getAll();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
         verify(service).findAll();
     }
 
     @Test
-    void testGetAll_ShouldReturnNoContent() {
-        when(service.findAll()).thenReturn(Collections.emptyList());
+    @WithMockUser(authorities = "USER_READ")
+    void getAll_whenEmpty_returnsEmptyArray() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
 
-        ResponseEntity<List<DepartmentDto>> response = controller.getAll();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        mockMvc.perform(get("/api/departments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
-    void testGetById_Found() {
-        long id = 1L;
-        Department entityToFound = Department.builder().id(id).build();
-        when(service.findById(any())).thenReturn(Optional.of(entityToFound));
+    @WithMockUser(authorities = "USER_READ")
+    void getById_whenFound_returnsDepartment() throws Exception {
+        when(service.findById(1L)).thenReturn(Optional.of(Department.builder().id(1L).build()));
 
-        ResponseEntity<DepartmentDto> response = controller.getById(id);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
+        mockMvc.perform(get("/api/departments/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void testGetById_NotFound() {
+    @WithMockUser(authorities = "USER_READ")
+    void getById_whenMissing_returnsNotFound() throws Exception {
         when(service.findById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<DepartmentDto> response = controller.getById(999L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        mockMvc.perform(get("/api/departments/{id}", 999L))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testCreate_ShouldReturnCreatedDepartment() {
-        long id = 10L;
-        DepartmentDto inputDto = new DepartmentDto();
-        Department savedEntity = Department.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<DepartmentDto> response = controller.create(inputDto);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("/api/departments/10", Objects.requireNonNull(response.getHeaders().getLocation()).toString());
+    @WithMockUser(authorities = "USER_READ")
+    void create_returnsCreatedDepartment() throws Exception {
+        when(service.save(any(Department.class))).thenReturn(Department.builder().id(10L).build());
+
+        mockMvc.perform(post("/api/departments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"id": 10}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(header().string(HttpHeaders.LOCATION, "/api/departments/10"))
+                .andExpect(jsonPath("$.id").value(10));
     }
 
     @Test
-    void testUpdate_ShouldReturnUpdatedDepartment() {
-        Long id = 5L;
-        DepartmentDto inputDto = DepartmentDto.builder().id(id).build();
-        Department savedEntity = Department.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<DepartmentDto> response = controller.update(id, inputDto);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
+    @WithMockUser(authorities = "USER_READ")
+    void update_returnsUpdatedDepartment() throws Exception {
+        when(service.save(any(Department.class))).thenReturn(Department.builder().id(5L).build());
+
+        mockMvc.perform(put("/api/departments/{id}", 5L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"id": 99}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(5));
     }
 
     @Test
-    void testDelete_ShouldReturnOk() {
-        doNothing().when(service).deleteById(1L);
+    @WithMockUser(authorities = "USER_READ")
+    void delete_returnsOk() throws Exception {
+        mockMvc.perform(delete("/api/departments/{id}", 1L))
+                .andExpect(status().isOk());
 
-        ResponseEntity<Void> response = controller.delete(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(service).deleteById(1L);
+    }
+
+    @Test
+    void getAll_withoutAuthentication_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/departments"))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(authorities = "DEVICE_READ")
+    void getAll_withoutUserRead_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/departments"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
     }
 }

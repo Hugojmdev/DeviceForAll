@@ -1,16 +1,14 @@
 package com.hgo_soft.device_for_all.users.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,5 +23,5 @@ public class Department {
     private String description;
 
     @OneToMany(mappedBy = "department")
-    private List<UserDetail> userDetail = new ArrayList<>();
+    private List<UserProfile> userProfile = new ArrayList<>();
 }
