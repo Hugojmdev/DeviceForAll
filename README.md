@@ -1,98 +1,200 @@
-# Spring Boot CRUD Backend – MySQL
+# Device for All
 
-## Overview
+Device for All is a REST API for managing institutional devices, users, departments, and device loans. It is built with Spring Boot, Spring Data JPA, MySQL, JWT authentication, permission-based authorization, and Flyway database migrations.
 
-This project is a structured backend application built with Java and Spring Boot, using MySQL as the relational database.
+## Current stack
 
-It demonstrates a clean and maintainable layered architecture designed for scalable CRUD-based systems, following enterprise best practices.
-
-The goal of this project is to provide a reference implementation of a well-structured REST API backend.
-
----
-
-## Tech Stack
-
-- Java 21 
-- Spring Boot 3.2.x
-- Spring Data JPA
-- Hibernate
-- MySQL 8.x
-- Swagger / OpenAPI
-- Docker
-
----
+- Java 23 (current Maven configuration)
+- Spring Boot 3.2.4
+- Spring MVC
+- Spring Data JPA and Hibernate
+- Spring Security
+- JSON Web Tokens (JJWT)
+- MySQL
+- Flyway
+- MapStruct and Lombok
+- Springdoc OpenAPI
+- Docker Compose
+- JUnit, Mockito, Spring Security Test, and H2 for tests
 
 ## Architecture
 
-The application follows a standard layered architecture:
+The application follows a layered structure:
 
-Controller → Service → Repository → Database
+```text
+Controller -> Service -> Repository -> Database
+```
 
-Key architectural elements:
+The source code is organized by domain:
 
-- DTO pattern for data transfer
-- Mapper layer for Entity ↔ DTO conversion
-- Global exception handling
-- Consistent HTTP response handling
-- Constructor-based dependency injection
-- Swagger integration for API documentation
+- `auth`: login, JWT handling, roles, permissions, and security configuration
+- `users`: users, user profiles, and departments
+- `devices`: devices and device types
+- `loans`: loans and loan comments
+- `common`: shared API responses, exception handling, and security components
 
----
+DTOs and MapStruct mappers keep the API models separate from the JPA entities. Shared exception handlers provide consistent authentication, authorization, validation, and resource error responses.
 
-## Features
+## Authentication and authorization
 
-- REST API endpoints
-- Full CRUD operations
-- Global exception handling
-- Clean separation of concerns
-- Scalable and reusable structure
-- Docker configuration for database setup
+The API uses stateless JWT authentication.
 
----
+- `POST /auth/login` is public.
+- All `/api/**` routes require an authenticated user.
+- Controller methods use permission-based authorization with `@PreAuthorize`.
+- User passwords are stored as BCrypt hashes.
+- JWTs are sent with the `Authorization: Bearer <token>` header.
+- Tokens currently expire after 24 hours.
+- Disabled users cannot authenticate or use an existing token.
 
-## API Documentation
+### Login
 
-Swagger UI is available at:
+Request:
 
-http://localhost:8080/swagger-ui.html
+```http
+POST /auth/login
+Content-Type: application/json
 
-This allows interactive testing and documentation of all REST endpoints.
+{
+  "username": "your-username",
+  "password": "your-password"
+}
+```
 
----
+Successful response:
 
-## Example Endpoints
+```json
+{
+  "token": "<jwt>"
+}
+```
 
-GET    /api/loans  
-GET    /api/loans/{id}  
-POST   /api/loans  
-PUT    /api/loans/{id}  
-DELETE /api/loans/{id}
+Use the returned token for protected requests:
 
----
+```http
+Authorization: Bearer <jwt>
+```
 
-## Running the Project
+The initial Flyway migration creates the `ADMIN`, `SUPERVISOR`, `STAFF`, and `BORROWER` roles and their permissions. It does not create a default user. A user with a BCrypt password hash and an assigned role must exist before login can succeed.
 
-1. Clone the repository
-2. Configure `application.properties`
-3. Start MySQL (or use Docker)
-4. Run the Spring Boot application:
+## API routes and required permissions
 
-  ` mvn spring-boot:run`
+| Resource | Operations | Required permission |
+| --- | --- | --- |
+| `/api/devices` | GET collection or item | `DEVICE_READ` |
+| `/api/devices` | POST | `DEVICE_CREATE` |
+| `/api/devices/{id}` | PUT | `DEVICE_UPDATE` |
+| `/api/devices/{id}` | DELETE | `DEVICE_RETIRE` |
+| `/api/loans` | GET collection | `LOAN_READ_ALL` |
+| `/api/loans/{id}` | GET | `LOAN_READ_OWN` |
+| `/api/loans` and `/api/loans/{id}` | POST, PUT, DELETE | `LOAN_CREATE_OWN` |
+| `/api/loan-comments` | GET collection or item | `LOAN_READ_ALL` |
+| `/api/loan-comments` and `/api/loan-comments/{id}` | POST, PUT, DELETE | `LOAN_CREATE_OWN` |
+| `/api/users` | GET, POST, PUT, DELETE | `USER_READ` |
+| `/api/departments` | GET, POST, PUT, DELETE | `USER_READ` |
+| `/api/roles` | GET collection or item | `ACCESS_MANAGE` |
+| `/api/permissions` | GET collection or item | `ACCESS_MANAGE` |
 
----
+These entries describe the permissions currently declared by the controllers.
 
-## Docker Support
+## Database migrations
 
-The project includes Docker configuration to simplify local database setup.
+Flyway is the only mechanism used to create and update the local MySQL schema. Hibernate validates the resulting schema with:
 
-You can start the MySQL container using:
+```properties
+spring.jpa.hibernate.ddl-auto=validate
+```
 
-`docker-compose up`
+Migration files are stored in:
 
----
+```text
+src/main/resources/db/migration
+```
 
-## Purpose
+They follow Flyway's naming convention:
 
-This project serves as a reference implementation of a clean Spring Boot backend system using MySQL.
+```text
+V{version}__{description}.sql
+```
 
-It demonstrates structured CRUD development, layered architecture, API documentation with Swagger, and best practices for maintainable backend systems.
+For example:
+
+```text
+V2__add_device_purchase_date.sql
+```
+
+Flyway applies pending migrations automatically when the application starts and records them in `flyway_schema_history`.
+
+Once a migration has been applied, do not edit it. Create a new migration with the next version instead.
+
+## Local configuration
+
+Create `src/main/resources/application.properties` with the local datasource and JWT settings. This file is ignored by Git.
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/device_loans
+spring.datasource.username=<database-user>
+spring.datasource.password=<database-password>
+
+spring.jpa.hibernate.ddl-auto=validate
+
+jwt.key=<base64-encoded-signing-key>
+```
+
+The datasource credentials must match the local MySQL configuration in `docker/docker-compose.yml`.
+
+## Running locally
+
+### Prerequisites
+
+- A JDK compatible with the Java version configured in `pom.xml`
+- Docker with Docker Compose
+
+### 1. Start MySQL
+
+From the project root:
+
+```powershell
+docker compose -f docker/docker-compose.yml up -d
+```
+
+### 2. Start the application
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+During startup, Flyway applies pending migrations and Hibernate validates the schema. The API is then available at:
+
+```text
+http://localhost:8080
+```
+
+### 3. Stop MySQL
+
+```powershell
+docker compose -f docker/docker-compose.yml down
+```
+
+## OpenAPI
+
+Springdoc is configured with these paths:
+
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+The current security configuration permits only `POST /auth/login` publicly, requires authentication for `/api/**`, and denies other routes. The OpenAPI and Swagger paths therefore need to be added to the security allowlist before the browser-based documentation can be accessed.
+
+## Tests
+
+Run the complete test suite with:
+
+```powershell
+.\mvnw.cmd test
+```
+
+The test profile uses an in-memory H2 database with Hibernate `create-drop`. Flyway is disabled for that profile because the production migration contains MySQL-specific SQL.
+
+## Current scope
+
+The project currently supports local development with Dockerized MySQL. Production deployment, externalized secrets, and production database migration procedures are planned separately.
