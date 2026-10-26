@@ -53,6 +53,7 @@ out/
 ### MySQL ###
 *.sql
 *.sql.gz
+!src/main/resources/db/migration/*.sql
 mysql-data/
 
 ### Docker ###
