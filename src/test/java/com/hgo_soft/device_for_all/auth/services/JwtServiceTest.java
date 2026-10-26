@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -38,7 +39,7 @@ public class JwtServiceTest {
     }
 
     @Test
-    void malformedToken_throwsMalformerdJwtTokenException(){
+    void malformedToken_throwsMalformedJwtTokenException(){
         assertThrows(MalformedJwtException.class, ()->jwtService.extractUsername("malformed-token"));
     }
 
@@ -53,5 +54,19 @@ public class JwtServiceTest {
                 .compact();
 
         assertThrows(ExpiredJwtException.class, ()->jwtService.extractUsername(expiredToken));
+    }
+
+    @Test
+    void tokenSignedWithDifferentKey_throwsSignatureException() {
+        SecretKey differentKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        String tokenWithInvalidSignature = Jwts.builder()
+                .setSubject("valid-user")
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(Instant.now().plusSeconds(60)))
+                .signWith(differentKey)
+                .compact();
+
+        assertThrows(SignatureException.class,
+                () -> jwtService.extractUsername(tokenWithInvalidSignature));
     }
 }

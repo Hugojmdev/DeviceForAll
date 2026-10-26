@@ -1,83 +1,117 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
-import com.hgo_soft.device_for_all.auth.dtos.RoleResponse;
 import com.hgo_soft.device_for_all.auth.entities.Role;
-import com.hgo_soft.device_for_all.auth.mappers.RoleMapper;
+import com.hgo_soft.device_for_all.auth.filters.JwtAuthenticationFilter;
 import com.hgo_soft.device_for_all.auth.mappers.RoleMapperImpl;
 import com.hgo_soft.device_for_all.auth.services.RoleService;
-import org.junit.jupiter.api.BeforeEach;
+import com.hgo_soft.device_for_all.common.security.WebMvcSecurityTestConfiguration;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class RoleControllerTest {
+@WebMvcTest(
+        controllers = RoleController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class
+        )
+)
+@Import({WebMvcSecurityTestConfiguration.class, RoleMapperImpl.class})
+class RoleControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
 
+    @MockBean
     private RoleService service;
-    private RoleController controller;
-
-    @BeforeEach
-    void setUp() {
-        service = mock(RoleService.class);
-        RoleMapper mapper = new RoleMapperImpl();
-        controller = new RoleController(service, mapper);
-    }
 
     @Test
-    void testGetAll_ShouldReturnListOfRoles() {
-        List<Role> roles = Arrays.asList(
-                Role.builder().id(1L).build(),
-                Role.builder().id(2L).build()
-        );
-        when(service.findAll()).thenReturn(roles);
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getAll_returnsRoles() throws Exception {
+        when(service.findAll()).thenReturn(List.of(
+                Role.builder().id(1L).name("ADMIN").build(),
+                Role.builder().id(2L).name("STAFF").build()
+        ));
 
-        ResponseEntity<List<RoleResponse>> response = controller.getAll();
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
         verify(service).findAll();
     }
 
     @Test
-    void testGetAll_ShouldReturnNoContent() {
-        ResponseEntity<List<RoleResponse>> response = controller.getAll();
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getAll_whenEmpty_returnsEmptyArray() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
-    void testGetById_Found() {
-        long id = 1L;
-        Role entityToFound = Role.builder().id(id).build();
-        when(service.findById(any())).thenReturn(Optional.of(entityToFound));
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getById_whenFound_returnsRole() throws Exception {
+        when(service.findById(1L)).thenReturn(Optional.of(
+                Role.builder().id(1L).name("ADMIN").build()
+        ));
 
-        ResponseEntity<RoleResponse> response = controller.getById(id);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().id());
+        mockMvc.perform(get("/api/roles/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void testGetById_NotFound() {
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getById_whenMissing_returnsNotFound() throws Exception {
         when(service.findById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<RoleResponse> response = controller.getById(999L);
+        mockMvc.perform(get("/api/roles/{id}", 999L))
+                .andExpect(status().isNotFound());
+    }
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    @Test
+    void getAll_withoutAuthentication_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(roles = "STAFF")
+    void getAll_withNonAdminRole_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAll_withAdminRoleButWithoutAccessManage_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/roles"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
     }
 }

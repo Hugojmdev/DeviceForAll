@@ -29,7 +29,6 @@ public class AuthExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ApiError> handleInvalidAuthentication(AuthenticationException ex, HttpServletRequest request) {
         ApiError error = ApiError.build(HttpStatus.UNAUTHORIZED,"Invalid Credentials!!!", request.getRequestURI());
-
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 

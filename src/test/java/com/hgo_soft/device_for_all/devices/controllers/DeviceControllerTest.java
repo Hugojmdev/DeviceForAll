@@ -1,113 +1,155 @@
 package com.hgo_soft.device_for_all.devices.controllers;
-import com.hgo_soft.device_for_all.devices.dtos.DeviceDto;
+
+import com.hgo_soft.device_for_all.auth.filters.JwtAuthenticationFilter;
+import com.hgo_soft.device_for_all.common.security.WebMvcSecurityTestConfiguration;
 import com.hgo_soft.device_for_all.devices.entities.Device;
-import com.hgo_soft.device_for_all.devices.mappers.DeviceMapper;
 import com.hgo_soft.device_for_all.devices.mappers.DeviceMapperImpl;
 import com.hgo_soft.device_for_all.devices.services.DeviceService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(
+        controllers = DeviceController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class
+        )
+)
+@Import({WebMvcSecurityTestConfiguration.class, DeviceMapperImpl.class})
 class DeviceControllerTest {
 
-    //@MockBean
-    private DeviceService service;
-    private DeviceController controller;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        service = mock(DeviceService.class);
-        //@Autowired
-        DeviceMapper mapper = new DeviceMapperImpl();
-        controller = new DeviceController(service, mapper);
-    }
+    @MockBean
+    private DeviceService service;
 
     @Test
-    void testGetAll_ShouldReturnListOfDevices() {
-        List<Device> devices = Arrays.asList(
+    @WithMockUser(authorities = "DEVICE_READ")
+    void getAll_returnsDevices() throws Exception {
+        when(service.findAll()).thenReturn(List.of(
                 Device.builder().id(1L).build(),
                 Device.builder().id(2L).build()
-        );
+        ));
 
-        when(service.findAll()).thenReturn(devices);
+        mockMvc.perform(get("/api/devices"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
 
-        ResponseEntity<List<DeviceDto>> response = controller.getAll();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
         verify(service).findAll();
     }
 
     @Test
-    void testGetAll_ShouldReturnNoContent() {
-        when(service.findAll()).thenReturn(Collections.emptyList());
+    @WithMockUser(authorities = "DEVICE_READ")
+    void getAll_whenEmpty_returnsEmptyArray() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
 
-        ResponseEntity<List<DeviceDto>> response = controller.getAll();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        mockMvc.perform(get("/api/devices"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
-    void testGetById_Found() {
-        long id = 1L;
-        Device entityToFound = Device.builder().id(id).build();
-        when(service.findById(any())).thenReturn(Optional.of(entityToFound));
+    @WithMockUser(authorities = "DEVICE_READ")
+    void getById_whenFound_returnsDevice() throws Exception {
+        when(service.findById(1L)).thenReturn(Optional.of(Device.builder().id(1L).build()));
 
-        ResponseEntity<DeviceDto> response = controller.getById(id);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
+        mockMvc.perform(get("/api/devices/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void testGetById_NotFound() {
+    @WithMockUser(authorities = "DEVICE_READ")
+    void getById_whenMissing_returnsNotFound() throws Exception {
         when(service.findById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<DeviceDto> response = controller.getById(999L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        mockMvc.perform(get("/api/devices/{id}", 999L))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testCreate_ShouldReturnCreatedDevice() {
-        long id = 10L;
-        DeviceDto inputDto = DeviceDto.builder().id(id).build();
-        Device savedEntity = Device.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<DeviceDto> response = controller.create(inputDto);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("/api/devices/10", Objects.requireNonNull(response.getHeaders().getLocation()).toString());
+    @WithMockUser(authorities = "DEVICE_CREATE")
+    void create_returnsCreatedDevice() throws Exception {
+        mockMvc.perform(post("/api/devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"id": 10}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(header().string(HttpHeaders.LOCATION, "/api/devices/10"))
+                .andExpect(jsonPath("$.id").value(10));
     }
 
     @Test
-    void testUpdate_ShouldReturnUpdatedDevice() {
-        Long id = 5L;
-        DeviceDto inputDto = DeviceDto.builder().id(id).build();
-        Device savedEntity = Device.builder().id(id).build();
-        when(service.save(any())).thenReturn(savedEntity);
-        ResponseEntity<DeviceDto> response = controller.update(id, inputDto);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().getId());
+    @WithMockUser(authorities = "DEVICE_UPDATE")
+    void update_returnsUpdatedDevice() throws Exception {
+        mockMvc.perform(put("/api/devices/{id}", 5L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"id": 99}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(5));
     }
 
     @Test
-    void testDelete_ShouldReturnOk() {
-        doNothing().when(service).deleteById(1L);
+    @WithMockUser(authorities = "DEVICE_RETIRE")
+    void delete_returnsOk() throws Exception {
+        mockMvc.perform(delete("/api/devices/{id}", 1L))
+                .andExpect(status().isOk());
 
-        ResponseEntity<Void> response = controller.delete(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(service).deleteById(1L);
+    }
+
+    @Test
+    void getAll_withoutAuthentication_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/devices"))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(authorities = "DEVICE_CREATE")
+    void getAll_withoutDeviceRead_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/devices"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(authorities = "DEVICE_READ")
+    void delete_withOnlyDeviceRead_returnsForbiddenWithoutCallingService() throws Exception {
+        mockMvc.perform(delete("/api/devices/{id}", 1L))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
     }
 }

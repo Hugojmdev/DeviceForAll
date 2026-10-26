@@ -1,79 +1,108 @@
 package com.hgo_soft.device_for_all.auth.controllers;
 
-import com.hgo_soft.device_for_all.auth.dtos.PermissionResponse;
 import com.hgo_soft.device_for_all.auth.entities.Permission;
-import com.hgo_soft.device_for_all.auth.mappers.PermissionMapper;
+import com.hgo_soft.device_for_all.auth.filters.JwtAuthenticationFilter;
 import com.hgo_soft.device_for_all.auth.mappers.PermissionMapperImpl;
 import com.hgo_soft.device_for_all.auth.services.PermissionService;
-import org.junit.jupiter.api.BeforeEach;
+import com.hgo_soft.device_for_all.common.security.WebMvcSecurityTestConfiguration;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class PermissionControllerTest {
+@WebMvcTest(
+        controllers = PermissionController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class
+        )
+)
+@Import({WebMvcSecurityTestConfiguration.class, PermissionMapperImpl.class})
+class PermissionControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private PermissionService service;
-    private PermissionController controller;
-
-    @BeforeEach
-    void setUp() {
-        service = mock(PermissionService.class);
-        PermissionMapper mapper = new PermissionMapperImpl();
-        controller = new PermissionController(service, mapper);
-    }
 
     @Test
-    void testGetAll_ShouldReturnListOfPermissions() {
-        List<Permission> permissions = Arrays.asList(
-                Permission.builder().id(1L).build(),
-                Permission.builder().id(2L).build()
-        );
-        when(service.findAll()).thenReturn(permissions);
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getAll_returnsPermissions() throws Exception {
+        when(service.findAll()).thenReturn(List.of(
+                Permission.builder().id(1L).name("DEVICE_READ").build(),
+                Permission.builder().id(2L).name("DEVICE_CREATE").build()
+        ));
 
-        ResponseEntity<List<PermissionResponse>> response = controller.getAll();
+        mockMvc.perform(get("/api/permissions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
         verify(service).findAll();
     }
 
     @Test
-    void testGetAll_ShouldReturnNoContent() {
-        ResponseEntity<List<PermissionResponse>> response = controller.getAll();
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getAll_whenEmpty_returnsEmptyArray() throws Exception {
+        when(service.findAll()).thenReturn(List.of());
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());;
+        mockMvc.perform(get("/api/permissions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
-    void testGetById_Found() {
-        long id = 1L;
-        Permission entityToFound = Permission.builder().id(id).build();
-        when(service.findById(any())).thenReturn(Optional.of(entityToFound));
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getById_whenFound_returnsPermission() throws Exception {
+        when(service.findById(1L)).thenReturn(Optional.of(
+                Permission.builder().id(1L).name("DEVICE_READ").build()
+        ));
 
-        ResponseEntity<PermissionResponse> response = controller.getById(id);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(id, response.getBody().id());
+        mockMvc.perform(get("/api/permissions/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void testGetById_NotFound() {
+    @WithMockUser(authorities = "ACCESS_MANAGE")
+    void getById_whenMissing_returnsNotFound() throws Exception {
         when(service.findById(999L)).thenReturn(Optional.empty());
 
-        ResponseEntity<PermissionResponse> response = controller.getById(999L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        mockMvc.perform(get("/api/permissions/{id}", 999L))
+                .andExpect(status().isNotFound());
     }
 
+    @Test
+    void getAll_withoutAuthentication_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/permissions"))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(roles = "STAFF")
+    void getAll_withoutAccessManage_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/permissions"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
 }
