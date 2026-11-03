@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.users.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "departments")
-public class Department {
+public class Department extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

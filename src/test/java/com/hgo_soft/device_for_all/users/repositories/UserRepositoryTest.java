@@ -4,11 +4,14 @@ import com.hgo_soft.device_for_all.auth.entities.Permission;
 import com.hgo_soft.device_for_all.auth.entities.Role;
 import com.hgo_soft.device_for_all.auth.repositories.PermissionRepository;
 import com.hgo_soft.device_for_all.auth.repositories.RoleRepository;
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingConfig;
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingTestConfig;
 import com.hgo_soft.device_for_all.users.entities.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
@@ -20,6 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import({
+        JpaAuditingConfig.class,
+        JpaAuditingTestConfig.class
+})
 public class UserRepositoryTest {
 
     @Autowired

@@ -1,6 +1,7 @@
 package com.hgo_soft.device_for_all.auth.entities;
 
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "permissions")
-public class Permission {
+public class Permission extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

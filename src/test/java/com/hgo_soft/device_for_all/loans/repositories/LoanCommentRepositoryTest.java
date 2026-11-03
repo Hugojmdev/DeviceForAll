@@ -1,5 +1,7 @@
 package com.hgo_soft.device_for_all.loans.repositories;
 
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingConfig;
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingTestConfig;
 import com.hgo_soft.device_for_all.loans.entities.Loan;
 import com.hgo_soft.device_for_all.loans.entities.LoanComment;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
@@ -8,11 +10,11 @@ import com.hgo_soft.device_for_all.users.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import({
+        JpaAuditingConfig.class,
+        JpaAuditingTestConfig.class
+})
 public class LoanCommentRepositoryTest {
 
     @Autowired
@@ -56,7 +62,6 @@ public class LoanCommentRepositoryTest {
         LoanComment loanComment2 = LoanComment.builder()
                 .loan(loan)
                 .comment("second-test-comment")
-                .createdAt(LocalDateTime.now())
                 .build();
         repository.saveAndFlush(loanComment2);
         List<LoanComment> loanComments = repository.findAll();
@@ -89,7 +94,6 @@ public class LoanCommentRepositoryTest {
 
         return LoanComment.builder()
                 .loan(loan)
-                .createdAt(LocalDateTime.now())
                 .comment(comment)
                 .build();
     }

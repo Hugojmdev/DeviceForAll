@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.loans.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.loans.enums.LoanStatus;
 import com.hgo_soft.device_for_all.users.entities.User;
@@ -16,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Loan {
+public class Loan extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
