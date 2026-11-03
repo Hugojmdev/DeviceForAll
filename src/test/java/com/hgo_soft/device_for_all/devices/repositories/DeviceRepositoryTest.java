@@ -1,11 +1,14 @@
 package com.hgo_soft.device_for_all.devices.repositories;
 
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingConfig;
+import com.hgo_soft.device_for_all.common.audit.JpaAuditingTestConfig;
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.devices.entities.DeviceType;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
@@ -14,6 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import({
+        JpaAuditingConfig.class,
+        JpaAuditingTestConfig.class
+})
 public class DeviceRepositoryTest {
 
     @Autowired

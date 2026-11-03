@@ -1,9 +1,9 @@
 package com.hgo_soft.device_for_all.loans.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "loan_comments")
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoanComment {
+public class LoanComment extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,4 @@ public class LoanComment {
 
     @Column(length = 250)
     private String comment;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }

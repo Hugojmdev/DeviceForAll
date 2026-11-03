@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.devices.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
 import com.hgo_soft.device_for_all.loans.entities.Loan;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "devices")
-public class Device {
+public class Device extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,9 +1,9 @@
 package com.hgo_soft.device_for_all.auth.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import com.hgo_soft.device_for_all.users.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Role {
+public class Role extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

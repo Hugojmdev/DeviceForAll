@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.devices.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DeviceType {
+public class DeviceType extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

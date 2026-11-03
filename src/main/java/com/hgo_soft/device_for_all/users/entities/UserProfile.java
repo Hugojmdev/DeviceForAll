@@ -1,5 +1,6 @@
 package com.hgo_soft.device_for_all.users.entities;
 
+import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserProfile {
+public class UserProfile extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
