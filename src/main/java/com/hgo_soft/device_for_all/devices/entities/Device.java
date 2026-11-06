@@ -1,13 +1,15 @@
 package com.hgo_soft.device_for_all.devices.entities;
 
 import com.hgo_soft.device_for_all.common.audit.AuditableEntity;
+import com.hgo_soft.device_for_all.devices.enums.DeviceCondition;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
-import com.hgo_soft.device_for_all.loans.entities.Loan;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -22,6 +24,10 @@ public class Device extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "device_type_id", nullable = false)
+    private DeviceType type;
+
     @Column(nullable = false)
     private String name;
 
@@ -30,20 +36,26 @@ public class Device extends AuditableEntity {
 
     private String model;
 
+    private String make;
+
     private String description;
 
-    /*@Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private DeviceType type;*/
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "status", nullable = false, length = 50)
     private DeviceStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "device_type_id")
-    private DeviceType deviceType;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "physical_condition", nullable = false, length = 50)
+    private DeviceCondition physicalCondition;
 
-    @ManyToMany(mappedBy = "devices")
-    private Set<Loan> loans = new HashSet<>();
+    private LocalDate acquiredOn;
+
+    private LocalDate warrantyExpiresOn;
+
+    private Instant retiredAt;
+
+    private String retirementReason;
+
 }

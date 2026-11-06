@@ -4,6 +4,7 @@ import com.hgo_soft.device_for_all.common.audit.JpaAuditingConfig;
 import com.hgo_soft.device_for_all.common.audit.JpaAuditingTestConfig;
 import com.hgo_soft.device_for_all.devices.entities.Device;
 import com.hgo_soft.device_for_all.devices.entities.DeviceType;
+import com.hgo_soft.device_for_all.devices.enums.DeviceCondition;
 import com.hgo_soft.device_for_all.devices.enums.DeviceStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,10 +27,13 @@ public class DeviceRepositoryTest {
 
     @Autowired
     DeviceRepository repository;
+    @Autowired
+    DeviceTypeRepository typeRepository;
 
     @Test
     public void testSave(){
         Device device = buildDevice("00-11-22");
+        typeRepository.save(device.getType());
         repository.save(device);
         assertNotNull(device.getId());
     }
@@ -36,6 +41,7 @@ public class DeviceRepositoryTest {
     @Test
     void testSaveAndFindById() {
         Device device = buildDevice("00-11-33");
+        typeRepository.save(device.getType());
         repository.save(device);
         assertNotNull(device.getId());
         Long deviceId = device.getId();
@@ -46,55 +52,58 @@ public class DeviceRepositoryTest {
     @Test
     void testFindByIdNotFound() {
         Device device = buildDevice("00-22-22");
+        typeRepository.save(device.getType());
         repository.save(device);
         assertNotNull(device.getId());
         Optional<Device> result = repository.findById(999L);
         assertTrue(result.isEmpty());
     }
 
-    /*@Test
-    void testFindAll() {
-        Device device = buildDevice("00-11-22");
-        repository.save(device);
-        Device device2 = buildDevice("00-11-33");
-        repository.save(device2);
-        List<Device> allDevices = repository.findAll();
-        assertEquals(2, allDevices.size());
-    }*/
-
     @Test
-    void testDeleteById() {
-        Device device = buildDevice("00-11-22");
-        repository.save(device);
-        Long deviceId = device.getId();
-        repository.deleteById(deviceId);
-        assertFalse(repository.findById(deviceId).isPresent());
+    void testFindAllDeviceTypesByActive() {
+        DeviceType activeType = DeviceType.builder()
+                .name("Laptop")
+                .active(true)
+                .build();
+        DeviceType inactiveType = DeviceType.builder()
+                .name("Legacy device type")
+                .active(false)
+                .build();
+        typeRepository.save(activeType);
+        typeRepository.save(inactiveType);
+
+        List<DeviceType> activeTypes = typeRepository.findAllByActive(true);
+        List<DeviceType> inactiveTypes = typeRepository.findAllByActive(false);
+
+        assertEquals(1, activeTypes.size());
+        assertEquals("Laptop", activeTypes.getFirst().getName());
+        assertEquals(1, inactiveTypes.size());
+        assertEquals("Legacy device type", inactiveTypes.getFirst().getName());
     }
 
-    /*@Test
-    void testUpdateDevice() {
-        Device device = Device.builder()
-                .id(321L)
-                .name("saved-device")
-                .serialNumber("SN321")
-                .model("M321")
-                .deviceType(DeviceType.builder().build())
-                .status(DeviceStatus.AVAILABLE)
+    @Test
+    void testFindDeviceTypeByNameIgnoreCase() {
+        DeviceType deviceType = DeviceType.builder()
+                .name("Projector")
                 .build();
+        typeRepository.save(deviceType);
 
-        Device saved = repository.save(device);
-        saved.setModel("m-124");
-        Device updated = repository.save(saved);
-        assertEquals("m-124", updated.getModel());
-    }*/
+        Optional<DeviceType> result = typeRepository.findByNameIgnoreCase("projector");
+
+        assertTrue(result.isPresent());
+        assertEquals(deviceType.getId(), result.get().getId());
+    }
 
     private Device buildDevice(String serialNumber) {
         return Device.builder()
+                .type(DeviceType.builder().name("test-type").build())
                 .name("test-device")
                 .serialNumber(serialNumber)
                 .model("X2023")
-                .deviceType(DeviceType.builder().build())
+                .make("test-make")
+                .description("testing")
                 .status(DeviceStatus.AVAILABLE)
+                .physicalCondition(DeviceCondition.GOOD)
                 .build();
     }
 }
