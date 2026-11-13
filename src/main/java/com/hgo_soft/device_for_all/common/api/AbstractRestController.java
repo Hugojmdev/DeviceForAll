@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public abstract class AbstractRestController {
 
+
     protected <T> ResponseEntity<T> okOrNotFound(T body) {
         return body == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(body);
     }
@@ -32,4 +33,5 @@ public abstract class AbstractRestController {
     protected ResponseEntity<Void> deletedSuccessfully() {
         return ResponseEntity.ok().build();
     }
+
 }
