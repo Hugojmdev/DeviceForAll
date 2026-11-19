@@ -2,11 +2,9 @@ package com.hgo_soft.device_for_all.devices.enums;
 
 public enum DeviceStatus {
     AVAILABLE,
-    IN_USE,
     RESERVED,
-    UNDER_MAINTENANCE,
+    ON_LOAN,
+    MAINTENANCE,
     LOST,
-    RETIRED,
-    DAMAGED,
-    PENDING_RETURN
+    RETIRED
 }

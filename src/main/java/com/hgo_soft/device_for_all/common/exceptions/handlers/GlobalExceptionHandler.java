@@ -2,6 +2,7 @@ package com.hgo_soft.device_for_all.common.exceptions.handlers;
 
 import com.hgo_soft.device_for_all.common.api.errors.ApiError;
 import com.hgo_soft.device_for_all.common.api.errors.ValidationApiError;
+import com.hgo_soft.device_for_all.common.exceptions.DeviceConflictException;
 import com.hgo_soft.device_for_all.common.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -28,4 +29,14 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationApiError);
     }
+
+   @ExceptionHandler(DeviceConflictException.class)
+    public ResponseEntity<ApiError> handleDeviceConflict(DeviceConflictException ex, HttpServletRequest request) {
+        ApiError apiError = ApiError.build(
+                HttpStatus.CONFLICT,
+                "Device Conflict!!!",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+   }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hgo_soft.device_for_all.auth.config.JwtAuthenticationEntryPoint;
 import com.hgo_soft.device_for_all.auth.services.JwtService;
 import com.hgo_soft.device_for_all.auth.services.SecurityUserDetailsService;
+import com.hgo_soft.device_for_all.auth.userdetails.ApplicationUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -15,8 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -94,10 +95,13 @@ public class JwtAuthenticationFilterTest {
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer valid-token");
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
-        UserDetails userDetails = User.withUsername("valid-user")
-                .password("valid-password")
-                .authorities("valid-role")
-                .build();
+        ApplicationUserDetails userDetails = new ApplicationUserDetails(
+                1L,
+                "valid-user",
+                "valid-password",
+                true,
+                Collections.emptyList()
+        );
 
         when(jwtService.extractUsername("valid-token")).thenReturn("valid-user");
         when(securityUserDetailsService.loadUserByUsername("valid-user")).thenReturn(userDetails);
@@ -129,15 +133,16 @@ public class JwtAuthenticationFilterTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
 
-        UserDetails disabledUserDetails = User
-                .withUsername("disabled-user")
-                .password("disabled-password")
-                .authorities("ROLE_VIEWER")
-                .disabled(true)
-                .build();
+        ApplicationUserDetails userDetails = new ApplicationUserDetails(
+                1L,
+                "disabled-user",
+                "disabled-password",
+                false,
+                Collections.emptyList()
+        );
 
         when(jwtService.extractUsername("valid-token")).thenReturn("disabled-user");
-        when(securityUserDetailsService.loadUserByUsername("disabled-user")).thenReturn(disabledUserDetails);
+        when(securityUserDetailsService.loadUserByUsername("disabled-user")).thenReturn(userDetails);
         when(jwtService.isTokenValid("valid-token", "disabled-user")).thenReturn(true);
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         assertEquals(401,response.getStatus());

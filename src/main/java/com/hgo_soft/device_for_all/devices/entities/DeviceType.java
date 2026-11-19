@@ -25,6 +25,11 @@ public class DeviceType extends AuditableEntity {
 
     private String description;
 
-    @OneToMany(mappedBy = "deviceType")
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "type")
     private List<Device> devices = new ArrayList<>();
 }
