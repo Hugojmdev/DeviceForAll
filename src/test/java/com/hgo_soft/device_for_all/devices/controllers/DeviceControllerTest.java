@@ -15,6 +15,9 @@ import com.hgo_soft.device_for_all.devices.enums.DeviceCondition;
 import com.hgo_soft.device_for_all.devices.mappers.DeviceMapperImpl;
 import com.hgo_soft.device_for_all.devices.services.DeviceService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +29,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -223,6 +228,66 @@ class DeviceControllerTest {
         verifyNoInteractions(service);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "name, 101",
+            "serialNumber, 101",
+            "model, 101",
+            "make, 101",
+            "description, 251"
+    })
+    @WithMockUser(authorities = "DEVICE_CREATE")
+    void create_whenTextFieldExceedsMaximumLength_returnsBadRequest(String field, int length) throws Exception {
+        Map<String, Object> request = new HashMap<>();
+        request.put("type", Map.of("id", 3));
+        request.put("name", "test-device");
+        request.put("serialNumber", "000-000100-22SS");
+        request.put("model", "Legion X3");
+        request.put("make", "Lenovo");
+        request.put("physicalCondition", DeviceCondition.GOOD);
+        request.put(field, "x".repeat(length));
+
+        mockMvc.perform(post("/api/devices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors." + field).exists());
+
+        verifyNoInteractions(service);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"name", "serialNumber", "model", "make"})
+    @WithMockUser(authorities = "DEVICE_UPDATE")
+    void update_whenProvidedTextFieldIsBlank_returnsBadRequest(String field) throws Exception {
+        mockMvc.perform(patch("/api/devices/{id}", 5L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(field, "   "))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors." + field).exists());
+
+        verifyNoInteractions(service);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "name, 101",
+            "serialNumber, 101",
+            "model, 101",
+            "make, 101",
+            "description, 251"
+    })
+    @WithMockUser(authorities = "DEVICE_UPDATE")
+    void update_whenTextFieldExceedsMaximumLength_returnsBadRequest(String field, int length) throws Exception {
+        mockMvc.perform(patch("/api/devices/{id}", 5L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(field, "x".repeat(length)))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors." + field).exists());
+
+        verifyNoInteractions(service);
+    }
+
     @Test
     @WithMockUser(authorities = "DEVICE_RETIRE")
     void retire_withoutReason_returnsBadRequest() throws Exception {
@@ -234,6 +299,22 @@ class DeviceControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(authorities = "DEVICE_RETIRE")
+    void retire_whenReasonExceedsMaximumLength_returnsBadRequest() throws Exception {
+        RetireDeviceRequest request = RetireDeviceRequest.builder()
+                .retirementReason("x".repeat(256))
+                .build();
+
+        mockMvc.perform(patch("/api/devices/retire/{id}", 5L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.retirementReason").exists());
 
         verifyNoInteractions(service);
     }
